@@ -96,6 +96,7 @@ const translations = {
     top_3_rec: "Top 3 Recommendations",
     top_5_rec: "Top 5 Recommendations",
     btn_use_current_climate: "Use Current Climate",
+    manual_city_prompt: "We couldn't detect your location automatically. Please enter your city name below:",
   },
   te: {
     heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై.",
@@ -127,6 +128,7 @@ const translations = {
     top_3_rec: "టాప్ 3 సిఫార్సులు",
     top_5_rec: "టాప్ 5 సిఫార్సులు",
     btn_use_current_climate: "ప్రస్తుత వాతావరణాన్ని వాడండి",
+    manual_city_prompt: "మేము మీ స్థానాన్ని స్వయంచాలకంగా గుర్తించలేకపోయాము. దయచేసి దిగువన మీ నగరం పేరును నమోదు చేయండి:",
   },
 };
 
@@ -765,6 +767,7 @@ async function detectLocation() {
           "Unable to detect location. Please enter your city manually.",
           currentLang === "te" ? "te-IN" : "en-US"
         );
+        showManualInputBox();
       }
     };
 
@@ -942,7 +945,82 @@ window.addEventListener("load", () => {
     lucide.createIcons();
     console.log("App initialized, triggering auto-location...");
     setTimeout(detectLocation, 1000);
+
+    // Fallback: If location auto-detection hangs or fails, show manual input after 6 seconds
+    setTimeout(() => {
+      if (userLocation === "Unknown") {
+        showManualInputBox();
+      }
+    }, 6000);
   } catch (e) {
     console.error("Initialization Error:", e);
   }
 });
+
+// Helper functions for manual crop recommendation fallback
+function showManualInputBox() {
+  const manualBox = id("crop-manual-input-box");
+  if (manualBox) {
+    manualBox.style.display = "block";
+  }
+  const listContainer = id("crop-recommendations-list");
+  if (listContainer && listContainer.innerHTML.includes("Please wait")) {
+    const errorMsg = currentLang === "te"
+      ? "ఆటో-లొకేషన్ చాలా సమయం తీసుకుంది. దయచేసి పైన మీ నగరాన్ని నమోదు చేయండి."
+      : "Auto-detection took too long. Please enter your city manually above.";
+    listContainer.innerHTML = `<div class="result-sub">${errorMsg}</div>`;
+  }
+}
+
+async function recommendCropsManual() {
+  const cityInput = id("crop-city-input");
+  const city = cityInput ? cityInput.value.trim() : "";
+  if (!city) {
+    alert("Please enter a city name");
+    return;
+  }
+
+  const btn = event.target;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch("/api/weather?city=" + encodeURIComponent(city));
+    if (res.status === 200) {
+      const data = await res.json();
+
+      // Update weather display card
+      id("w-temp").textContent = data.temperature + "°C";
+      id("w-desc").textContent = data.description + ` in ${data.city}`;
+      id("w-hum").textContent = data.humidity + "%";
+      id("w-wind").textContent = data.wind_speed + " km/h";
+      id("w-feels").textContent = data.feels_like + "°C";
+      id("w-rain").textContent = data.rain_chance + "%";
+      const advisory = id("w-advisory");
+      if (advisory) {
+        advisory.style.display = "block";
+        advisory.textContent = data.farming_advisory;
+      }
+
+      // Update global location
+      userLocation = data.city;
+
+      // Hide the error box
+      const manualBox = id("crop-manual-input-box");
+      if (manualBox) manualBox.style.display = "none";
+
+      // Trigger recommendation
+      await predictCrop();
+    } else {
+      const errorData = await res.json();
+      alert(errorData.detail || "City not found");
+    }
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+
+  btn.innerHTML = originalHtml;
+  btn.disabled = false;
+  lucide.createIcons();
+}

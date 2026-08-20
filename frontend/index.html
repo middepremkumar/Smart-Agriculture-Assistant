@@ -249,6 +249,18 @@
               <span>Detecting your location and weather to recommend crops...</span>
             </p>
 
+            <div id="crop-manual-input-box" style="display: none; margin-bottom: 16px; background: rgba(10, 46, 26, 0.2); padding: 12px; border-radius: var(--radius-sm); border: 1px dashed rgba(46, 204, 113, 0.2);">
+              <p style="font-size: 0.82rem; color: var(--gray-400); margin-bottom: 8px;" data-t="manual_city_prompt">
+                We couldn't detect your location automatically. Please enter your city name below:
+              </p>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="crop-city-input" placeholder="e.g. Kurnool" style="flex: 1; padding: 10px 12px; background: rgba(10,46,26,0.6); border: 1px solid rgba(46,204,113,0.2); border-radius: var(--radius-sm); color: var(--white); font-size: 0.9rem;" />
+                <button class="btn-primary" onclick="recommendCropsManual()" style="padding: 10px 16px; margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+                  <i data-lucide="sprout" style="width:14px; height:14px;"></i> Recommend
+                </button>
+              </div>
+            </div>
+
             <button
               class="btn-primary"
               style="width: 100%; margin-top: 8px; margin-bottom: 16px;"
