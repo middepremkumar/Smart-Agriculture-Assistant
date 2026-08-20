@@ -591,37 +591,37 @@ const schemes = [
     icon: '<i data-lucide="banknote"></i>',
     name: "PM-KISAN",
     desc: "₹6,000/year direct income support to eligible farmer families in three equal installments.",
-    link: "#",
+    link: "https://pmkisan.gov.in/",
   },
   {
     icon: '<i data-lucide="wheat"></i>',
     name: "PM Fasal Bima Yojana",
     desc: "Crop insurance scheme providing financial support to farmers suffering crop loss/damage.",
-    link: "#",
+    link: "https://pmfby.gov.in/",
   },
   {
     icon: '<i data-lucide="droplet"></i>',
     name: "PM Krishi Sinchai Yojana",
     desc: '"Har Khet Ko Pani" — irrigation water to every field through targeted investment for irrigation.',
-    link: "#",
+    link: "https://pmksy.gov.in/",
   },
   {
     icon: '<i data-lucide="test-tube"></i>',
     name: "Soil Health Card",
     desc: "Free soil testing and Health Card to farmers with crop-wise recommendations for nutrients.",
-    link: "#",
+    link: "https://soilhealth.dac.gov.in/",
   },
   {
     icon: '<i data-lucide="smartphone"></i>',
     name: "e-NAM",
     desc: "National Agriculture Market — online trading platform connecting farmers to multiple buyers.",
-    link: "#",
+    link: "https://www.enam.gov.in/",
   },
   {
     icon: '<i data-lucide="leaf"></i>',
     name: "Paramparagat Krishi",
     desc: "Cluster-based organic farming with financial assistance, capacity building, and market support.",
-    link: "#",
+    link: "https://pgsindia-ncof.gov.in/",
   },
 ];
 
@@ -636,7 +636,9 @@ function loadSchemes() {
       <div class="scheme-icon">${s.icon}</div>
       <div class="scheme-name">${s.name}</div>
       <p class="scheme-desc">${s.desc}</p>
-      <a href="${s.link}" class="scheme-link">Learn More →</a>
+      <a href="${s.link}" class="scheme-link" target="_blank" rel="noopener noreferrer">
+  Learn More →
+</a>
     </div>
   `,
     )
