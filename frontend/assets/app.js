@@ -807,19 +807,6 @@ async function detectLocation() {
       }
     };
 
-    const cached = localStorage.getItem("agri_location");
-    if (cached) {
-      try {
-        const { city, state } = JSON.parse(cached);
-        if (city && state) {
-          console.log("Using cached location:", city);
-          await handleSuccess(city, state);
-          return;
-        }
-      } catch (e) {
-        console.error("Cache Error:", e);
-      }
-    }
 
     if (!navigator.geolocation) {
       console.log("Geolocation not supported.");
