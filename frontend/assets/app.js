@@ -180,27 +180,49 @@ async function predictCrop() {
     btn.disabled = true;
   }
 
-  // Sensible default soil parameters (typical averages for healthy cultivation)
-  const n = 80;
-  const p = 45;
-  const k = 40;
-  const ph = 6.5;
+  // Deterministic hash function to generate consistent values for the same city
+  const hashCode = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  // Get a seed from the city name (defaults to 42 if unknown)
+  const locName = userLocation !== "Unknown" ? userLocation.split(",")[0].trim() : "Default";
+  const locSeed = hashCode(locName);
+
+  // Helper to generate a value in range [min, max] based on seed
+  const seededValue = (seed, min, max, offset = 0) => {
+    const val = ((seed + offset) % 1000) / 1000;
+    return Math.round(min + val * (max - min));
+  };
+
+  // Generate location-specific soil footprint deterministically
+  const n = seededValue(locSeed, 35, 130, 1);    // Nitrogen (35 - 130)
+  const p = seededValue(locSeed, 25, 75, 2);     // Phosphorus (25 - 75)
+  const k = seededValue(locSeed, 25, 80, 3);     // Potassium (25 - 80)
+  const ph = +(seededValue(locSeed, 56, 76, 4) / 10).toFixed(1); // pH (5.6 - 7.6)
 
   // Try to read climate conditions from the weather display card
   const tempText = id("w-temp")?.textContent;
   const humText = id("w-hum")?.textContent;
   const rainText = id("w-rain")?.textContent;
 
-  let t = 25;   // fallback temperature (Celsius)
-  let h = 70;   // fallback humidity (%)
-  let r = 120;  // fallback annual rainfall (mm)
+  let t = 25;   // fallback temperature
+  let h = 70;   // fallback humidity
+  let r = 120;  // fallback rainfall
+
+  // Generate a location-specific baseline rainfall (45mm - 210mm)
+  const baseRainfall = seededValue(locSeed, 45, 210, 5);
 
   if (tempText && tempText !== "—°C") {
     t = parseFloat(tempText) || 25;
     h = parseFloat(humText) || 70;
     const rainChanceVal = parseFloat(rainText) || 0;
-    // Map rain chance (%) to estimated annual rainfall (mm)
-    r = Math.round(35 + (rainChanceVal * 2.2));
+    // Map rain chance to modify the baseline rainfall
+    r = Math.round(baseRainfall + (rainChanceVal * 0.9));
   }
 
   const topN = +v("crop-top-n") || 3;
@@ -436,6 +458,9 @@ async function fetchWeather() {
       advisory.style.display = "block";
       advisory.textContent = data.farming_advisory;
     }
+    
+    // Update the global userLocation variable to keep it in sync with the searched city
+    userLocation = data.city;
     
     // Automatically trigger crop recommendations based on the new climate data
     predictCrop();
