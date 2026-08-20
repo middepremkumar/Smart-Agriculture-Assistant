@@ -232,103 +232,35 @@
           </div>
           <div class="tool-card">
             <div class="spotlight"></div>
-            <h4>Enter Soil & Climate Data</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-n"
-                  placeholder=" "
-                  min="0"
-                  max="200"
-                />
-                <label class="form-label">Nitrogen (N) kg/ha</label>
-              </div>
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-p"
-                  placeholder=" "
-                  min="0"
-                  max="150"
-                />
-                <label class="form-label">Phosphorus (P) kg/ha</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+              <h4 style="margin: 0;" data-t="crop_recommendations_title">Crop Recommendation Results</h4>
+              <div class="form-group" style="margin: 0; width: auto; display: inline-flex; align-items: center; gap: 8px; flex-direction: row-reverse;">
+                <select class="form-select" id="crop-top-n" onchange="predictCrop()" style="padding: 6px 12px 6px 8px; font-size: 0.8rem; border-radius: var(--radius-sm); margin: 0; height: auto; width: 160px; background: rgba(10,46,26,0.6); color: var(--white); border: 1px solid rgba(46,204,113,0.2);">
+                  <option value="1" data-t="top_1_rec">Top 1 Recommendation</option>
+                  <option value="3" data-t="top_3_rec" selected>Top 3 Recommendations</option>
+                  <option value="5" data-t="top_5_rec">Top 5 Recommendations</option>
+                </select>
+                <label class="form-label" data-t="crop_top_n_label" style="position: static; font-size: 0.8rem; color: var(--gray-400); font-weight: 500; pointer-events: auto; transform: none; margin-right: 4px;">Number of Recommendations</label>
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-k"
-                  placeholder=" "
-                  min="0"
-                  max="210"
-                />
-                <label class="form-label">Potassium (K) kg/ha</label>
-              </div>
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-ph"
-                  placeholder=" "
-                  min="0"
-                  max="14"
-                  step="0.1"
-                />
-                <label class="form-label">Soil pH</label>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-temp"
-                  placeholder=" "
-                  min="-10"
-                  max="50"
-                />
-                <label class="form-label">Temperature (°C)</label>
-              </div>
-              <div class="form-group">
-                <input
-                  type="number"
-                  class="form-input"
-                  id="crop-hum"
-                  placeholder=" "
-                  min="0"
-                  max="100"
-                />
-                <label class="form-label">Humidity (%)</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <input
-                type="number"
-                class="form-input"
-                id="crop-rain"
-                placeholder=" "
-                min="0"
-                max="3000"
-              />
-              <label class="form-label">Rainfall (mm)</label>
-            </div>
+
+            <p id="crop-location-text" style="font-size: 0.9rem; color: var(--gray-300); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; background: rgba(46, 204, 113, 0.05); padding: 10px 12px; border-radius: var(--radius-sm); border-left: 4px solid var(--green-500); line-height: 1.4;">
+              <i data-lucide="map-pin" style="width:16px; height:16px; color:var(--green-400); flex-shrink: 0;"></i>
+              <span>Detecting your location and weather to recommend crops...</span>
+            </p>
+
             <button
               class="btn-primary"
-              style="width: 100%; margin-top: 8px"
+              style="width: 100%; margin-top: 8px; margin-bottom: 16px;"
               onclick="predictCrop()"
+              id="predictBtn"
             >
-              <i data-lucide="sprout"></i> Predict Best Crop
+              <i data-lucide="refresh-cw"></i> Refresh Recommendations
             </button>
-            <div class="result-box" id="crop-result">
-              <div class="result-title">Recommended Crop</div>
-              <div class="result-value" id="crop-result-val">—</div>
-              <div class="result-sub" id="crop-result-sub">
-                Enter values and click predict.
+
+            <div class="result-box visible" id="crop-result" style="margin-top: 0; display: block; background: transparent; border: none; padding: 0;">
+              <div id="crop-recommendations-list">
+                <div class="result-sub">Please wait, detecting location & climate conditions...</div>
               </div>
             </div>
           </div>

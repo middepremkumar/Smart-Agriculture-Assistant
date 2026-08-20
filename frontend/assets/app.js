@@ -90,6 +90,12 @@ const translations = {
     tool_disease_title: "Plant Disease Detection by Image",
     tool_market_title: "Market Price Analysis",
     tool_land_title: "Smart Land Valuation",
+    crop_recommendations_title: "Crop Recommendation Results",
+    crop_top_n_label: "Number of Recommendations",
+    top_1_rec: "Top 1 Recommendation",
+    top_3_rec: "Top 3 Recommendations",
+    top_5_rec: "Top 5 Recommendations",
+    btn_use_current_climate: "Use Current Climate",
   },
   te: {
     heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై.",
@@ -115,6 +121,12 @@ const translations = {
     tool_disease_title: "చిత్రం ద్వారా మొక్కల వ్యాధి గుర్తింపు",
     tool_market_title: "మార్కెట్ ధరల విశ్లేషణ",
     tool_land_title: "స్మార్ట్ భూమి మూల్యాంకనం",
+    crop_recommendations_title: "పంట సిఫార్సు ఫలితాలు",
+    crop_top_n_label: "సిఫార్సుల సంఖ్య",
+    top_1_rec: "టాప్ 1 సిఫార్సు",
+    top_3_rec: "టాప్ 3 సిఫార్సులు",
+    top_5_rec: "టాప్ 5 సిఫార్సులు",
+    btn_use_current_climate: "ప్రస్తుత వాతావరణాన్ని వాడండి",
   },
 };
 
@@ -160,20 +172,53 @@ function setLanguage(lang) {
 // CROP RECOMMENDATION — Predict crop
 // ================================================
 async function predictCrop() {
-  const n = +v("crop-n"),
-    p = +v("crop-p"),
-    k = +v("crop-k"),
-    ph = +v("crop-ph"),
-    t = +v("crop-temp"),
-    h = +v("crop-hum"),
-    r = +v("crop-rain");
-  if (!n && !p && !ph) {
-    alert("Please fill in soil data");
-    return;
+  const btn = id("predictBtn");
+  if (btn) {
+    btn.innerHTML = '<span class="spinner"></span>Predicting...';
+    btn.disabled = true;
   }
-  const btn = event.target;
-  btn.innerHTML = '<span class="spinner"></span>Predicting...';
-  btn.disabled = true;
+
+  // Sensible default soil parameters (typical averages for healthy cultivation)
+  const n = 80;
+  const p = 45;
+  const k = 40;
+  const ph = 6.5;
+
+  // Try to read climate conditions from the weather display card
+  const tempText = id("w-temp")?.textContent;
+  const humText = id("w-hum")?.textContent;
+  const rainText = id("w-rain")?.textContent;
+
+  let t = 25;   // fallback temperature (Celsius)
+  let h = 70;   // fallback humidity (%)
+  let r = 120;  // fallback annual rainfall (mm)
+
+  if (tempText && tempText !== "—°C") {
+    t = parseFloat(tempText) || 25;
+    h = parseFloat(humText) || 70;
+    const rainChanceVal = parseFloat(rainText) || 0;
+    // Map rain chance (%) to estimated annual rainfall (mm)
+    r = Math.round(35 + (rainChanceVal * 2.2));
+  }
+
+  const topN = +v("crop-top-n") || 3;
+
+  // Update location status display text
+  const locText = id("crop-location-text");
+  if (locText) {
+    const locName = userLocation !== "Unknown" ? userLocation : "Detected Location";
+    const climateStr = tempText && tempText !== "—°C"
+      ? `(${t}°C, ${h}% Humidity, ~${r}mm Rainfall)`
+      : `(Using regional average climate conditions)`;
+    
+    const recLabel = currentLang === "te" ? "సిఫార్సు పంటలు:" : "Recommending crops for";
+    locText.innerHTML = `
+      <i data-lucide="map-pin" style="width:16px; height:16px; color:var(--green-400); flex-shrink: 0;"></i>
+      <span>${recLabel} <strong>${locName}</strong> ${climateStr}</span>
+    `;
+    lucide.createIcons();
+  }
+
   try {
     const res = await fetch("/api/predict/crop", {
       method: "POST",
@@ -186,18 +231,71 @@ async function predictCrop() {
         temperature: t,
         humidity: h,
         rainfall: r,
+        top_n: topN
       }),
     });
     const data = await res.json();
     show("crop-result");
-    id("crop-result-val").textContent = data.crop;
-    id("crop-result-sub").textContent =
-      data.fertilizer_tip + " (Confidence: " + data.confidence + "%)";
+
+    const listContainer = id("crop-recommendations-list");
+    if (listContainer) {
+      listContainer.innerHTML = "";
+
+      const confLabel = currentLang === "te" ? "విశ్వసనీయత" : "Confidence";
+      const fertLabel = currentLang === "te" ? "ఎరువుల చిట్కా" : "Fertilizer Tip";
+
+      if (data.recommendations && data.recommendations.length > 0) {
+        data.recommendations.forEach((item, idx) => {
+          const itemEl = document.createElement("div");
+          itemEl.className = "crop-rec-item";
+
+          const cropImgFile = item.crop.toLowerCase() + ".png";
+          const cropImgPath = `/assets/images/${cropImgFile}`;
+
+          itemEl.innerHTML = `
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+              <img src="${cropImgPath}" alt="${item.crop}" class="crop-rec-img" onerror="this.src='/assets/images/rice.png'; this.onerror=null;" />
+              <div style="flex: 1;">
+                <div class="crop-rec-header">
+                  <span class="crop-rec-name">${idx + 1}. ${item.crop}</span>
+                  <span class="crop-rec-conf">${confLabel}: ${item.confidence}%</span>
+                </div>
+                <div class="crop-rec-bar-bg">
+                  <div class="crop-rec-bar" id="crop-bar-${idx}" style="width: 0%"></div>
+                </div>
+                <div class="crop-rec-tip">
+                  <strong>${fertLabel}:</strong> ${item.fertilizer_tip}
+                </div>
+              </div>
+            </div>
+          `;
+          listContainer.appendChild(itemEl);
+
+          // Trigger smooth progress bar animation
+          setTimeout(() => {
+            const bar = id(`crop-bar-${idx}`);
+            if (bar) {
+              bar.style.width = `${item.confidence}%`;
+            }
+          }, 50);
+        });
+      } else {
+        listContainer.innerHTML = `<div class="result-sub">No recommendations found.</div>`;
+      }
+    }
   } catch (err) {
-    alert("API Error: " + err.message);
+    console.error("API Error:", err);
+    const listContainer = id("crop-recommendations-list");
+    if (listContainer) {
+      listContainer.innerHTML = `<div class="result-sub" style="color: var(--red-400)">Error fetching recommendations: ${err.message}</div>`;
+    }
   }
-  btn.innerHTML = "Predict Best Crop";
-  btn.disabled = false;
+
+  if (btn) {
+    btn.innerHTML = '<i data-lucide="refresh-cw"></i> Refresh Recommendations';
+    btn.disabled = false;
+    lucide.createIcons();
+  }
 }
 
 // ================================================
@@ -332,8 +430,13 @@ async function fetchWeather() {
     id("w-feels").textContent = data.feels_like + "°C";
     id("w-rain").textContent = data.rain_chance + "%";
     const advisory = document.getElementById("w-advisory");
-    advisory.style.display = "block";
-    advisory.textContent = data.farming_advisory;
+    if (advisory) {
+      advisory.style.display = "block";
+      advisory.textContent = data.farming_advisory;
+    }
+    
+    // Automatically trigger crop recommendations based on the new climate data
+    predictCrop();
   } catch (err) {
     alert("API Error: " + err.message);
   }

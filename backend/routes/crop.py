@@ -40,32 +40,43 @@ class CropInput(BaseModel):
     temperature:  float = Field(..., ge=-10, le=50, description="Temperature in Celsius")
     humidity:     float = Field(..., ge=0, le=100, description="Relative humidity %")
     rainfall:     float = Field(..., ge=0, le=3000, description="Annual rainfall in mm")
+    top_n:        int = Field(default=3, ge=1, le=10, description="Number of crop recommendations to return")
 
 # ===== FERTILIZER ADVICE =====
-# Rule-based system based on standard Indian agriculture recommendations
+# Direct commercial fertilizer names and actionable application advice for farmers
 FERTILIZER_ADVICE = {
-    "Rice":     "Apply NPK 120:60:60 kg/ha. Split Urea in 3 doses.",
-    "Maize":    "Apply NPK 120:60:40 kg/ha. Add zinc sulfate 25 kg/ha.",
-    "Wheat":    "Apply NPK 120:60:40 kg/ha. Top-dress urea at tillering.",
-    "Sugarcane":"Apply NPK 250:100:120 kg/ha. Add organic manure.",
-    "Cotton":   "Apply NPK 120:60:60 kg/ha. Monitor for Bt efficacy.",
-    "Groundnut":"Apply NPK 25:50:75 kg/ha. Inoculate with Rhizobium.",
-    "default":  "Follow balanced NPK ratio based on soil test report."
+    "Rice":     "Use Urea (Nitrogen), DAP (Phosphorus), and Potash (MOP). Split Urea into 3 doses: at planting, active growth, and flowering.",
+    "Maize":    "Use Urea, DAP, Potash (MOP), and Zinc Sulfate. Apply Zinc Sulfate at sowing to prevent yellow leaf disease.",
+    "Wheat":    "Use Urea, DAP, and Potash (MOP). Top-dress with Urea immediately after the first watering/irrigation.",
+    "Sugarcane":"Requires heavy feeding. Apply high doses of Urea, DAP, and Potash (MOP). Mix organic Compost/Manure into soil before planting.",
+    "Cotton":   "Use Urea, DAP, and Potash (MOP). Split Urea in two: half at sowing, half during flowering.",
+    "Groundnut":"Needs less Nitrogen. Apply DAP, Potash (MOP), and treat seeds with Rhizobium bio-fertilizer to improve root nodules.",
+    "Coffee":   "Use Urea, Rock Phosphate, and Potash (MOP). Keep soil moist by covering root areas with dry leaves (mulching).",
+    "Mango":    "Use Urea, Single Superphosphate (SSP), Potash (MOP), and well-decomposed Farmyard Manure (Cow dung compost) after harvesting.",
+    "Tomato":   "Use Urea, DAP, and Potash (MOP). Apply Gypsum/Calcium fertilizer to prevent tomato bottom-end rot disease.",
+    "default":  "Apply a balanced mix of Urea, DAP, and Potash (MOP) based on local soil test advice."
 }
 
 # ===== LOAD MODEL ONCE AT STARTUP =====
 # We load it outside the function so it's only loaded once (not per request)
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "../ml_models/crop_model.pkl")
 crop_model = None
+crop_classes = None
 
 def load_crop_model():
     """Load the pickled Random Forest model from disk."""
-    global crop_model
+    global crop_model, crop_classes
     try:
         with open(MODEL_PATH, "rb") as f:
             crop_model_data = pickle.load(f)
-            crop_model = crop_model_data["model"] if isinstance(crop_model_data, dict) else crop_model_data
+            if isinstance(crop_model_data, dict):
+                crop_model = crop_model_data["model"]
+                crop_classes = crop_model_data.get("classes")
+            else:
+                crop_model = crop_model_data
         print("Crop model loaded successfully")
+        if crop_classes is not None:
+            print(f"Crop classes loaded: {crop_classes}")
     except Exception as e:
         print(f"Crop model not loaded ({e}) - using fallback rule-based system")
 
@@ -93,7 +104,7 @@ def predict_crop(data: CropInput):
     1. Receive and validate input via Pydantic model
     2. Convert to numpy array for model input
     3. Run prediction using trained Random Forest
-    4. Return crop name, confidence, and fertilizer tip
+    4. Return crop recommendations list
     """
     try:
         features = np.array([[
@@ -108,30 +119,65 @@ def predict_crop(data: CropInput):
 
         if crop_model is not None:
             # Use trained ML model
-            crop_name = str(crop_model.predict(features)[0])
             # predict_proba gives probability for each class
             proba = crop_model.predict_proba(features)[0]
-            confidence = round(float(max(proba)) * 100, 1)
-            # Get top 3 alternative crops
-            classes = crop_model.classes_
-            top3_idx = np.argsort(proba)[::-1][:3]
-            alternatives = [str(classes[i]) for i in top3_idx[1:]]
+            
+            # If classes metadata is loaded, map predicted indices to class names
+            if crop_classes is not None:
+                # Get indices of top N predictions sorted in descending order
+                top_n_idx = np.argsort(proba)[::-1][:data.top_n]
+                
+                recommendations = []
+                for idx in top_n_idx:
+                    c_name = str(crop_classes[idx])
+                    conf = round(float(proba[idx]) * 100, 1)
+                    fert = FERTILIZER_ADVICE.get(c_name.capitalize(), FERTILIZER_ADVICE["default"])
+                    recommendations.append({
+                        "crop": c_name.capitalize(),
+                        "confidence": conf,
+                        "fertilizer_tip": fert
+                    })
+                
+                # For backward compatibility
+                crop_name = recommendations[0]["crop"]
+                confidence = recommendations[0]["confidence"]
+                fertilizer = recommendations[0]["fertilizer_tip"]
+                alternatives = [r["crop"] for r in recommendations[1:]]
+            else:
+                # If we don't have class names metadata, fallback to integer prediction names
+                crop_name = str(crop_model.predict(features)[0])
+                confidence = round(float(max(proba)) * 100, 1)
+                classes = crop_model.classes_
+                top3_idx = np.argsort(proba)[::-1][:3]
+                alternatives = [str(classes[i]) for i in top3_idx[1:]]
+                recommendations = [{"crop": crop_name, "confidence": confidence, "fertilizer_tip": FERTILIZER_ADVICE.get(crop_name, FERTILIZER_ADVICE["default"])}]
         else:
             # Fallback when model not available
-            crop_name = rule_based_crop(
-                data.nitrogen, data.phosphorus, data.potassium,
-                data.ph, data.temperature, data.humidity, data.rainfall
-            )
-            confidence = 85.0
-            alternatives = ["Wheat", "Maize"]
-
-        fertilizer = FERTILIZER_ADVICE.get(crop_name, FERTILIZER_ADVICE["default"])
+            fallback_crops = ["Rice", "Wheat", "Maize", "Groundnut", "Sugarcane", "Coffee", "Mango"]
+            recommendations = []
+            for i in range(min(data.top_n, len(fallback_crops))):
+                c_name = fallback_crops[i]
+                conf = round(85.0 - (i * 10.0), 1)
+                if conf < 1.0:
+                    conf = 5.0
+                fert = FERTILIZER_ADVICE.get(c_name, FERTILIZER_ADVICE["default"])
+                recommendations.append({
+                    "crop": c_name,
+                    "confidence": conf,
+                    "fertilizer_tip": fert
+                })
+            
+            crop_name = recommendations[0]["crop"]
+            confidence = recommendations[0]["confidence"]
+            fertilizer = recommendations[0]["fertilizer_tip"]
+            alternatives = [r["crop"] for r in recommendations[1:]]
 
         return {
             "crop":           crop_name,
             "confidence":     confidence,
             "fertilizer_tip": fertilizer,
             "alternatives":   alternatives,
+            "recommendations": recommendations,
             "status":         "success"
         }
 
