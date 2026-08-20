@@ -236,9 +236,20 @@ async function predictCrop() {
       : `(Using regional average climate conditions)`;
     
     const recLabel = currentLang === "te" ? "సిఫార్సు పంటలు:" : "Recommending crops for";
+    const changeLabel = currentLang === "te" 
+      ? "(తప్పా? దిగువ వాతావరణ విభాగంలో మీ నగరాన్ని శోధించండి)" 
+      : "(Not correct? Search your city in the weather section below)";
+
     locText.innerHTML = `
-      <i data-lucide="map-pin" style="width:16px; height:16px; color:var(--green-400); flex-shrink: 0;"></i>
-      <span>${recLabel} <strong>${locName}</strong> ${climateStr}</span>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="map-pin" style="width:16px; height:16px; color:var(--green-400); flex-shrink: 0;"></i>
+          <span>${recLabel} <strong>${locName}</strong> ${climateStr}</span>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--gray-400); padding-left: 24px; font-style: italic; font-weight: 500;">
+          ${changeLabel}
+        </span>
+      </div>
     `;
     lucide.createIcons();
   }
