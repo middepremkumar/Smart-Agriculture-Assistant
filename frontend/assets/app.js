@@ -1005,10 +1005,12 @@ async function recommendCropsManual() {
     return;
   }
 
-  const btn = event.target;
-  const originalHtml = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner"></span>';
-  btn.disabled = true;
+  const btn = id("crop-manual-btn");
+  const originalHtml = btn ? btn.innerHTML : "Recommend";
+  if (btn) {
+    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true;
+  }
 
   try {
     const res = await fetch("/api/weather?city=" + encodeURIComponent(city));
@@ -1045,7 +1047,9 @@ async function recommendCropsManual() {
     alert("Error: " + err.message);
   }
 
-  btn.innerHTML = originalHtml;
-  btn.disabled = false;
+  if (btn) {
+    btn.innerHTML = originalHtml;
+    btn.disabled = false;
+  }
   lucide.createIcons();
 }
