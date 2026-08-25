@@ -237,7 +237,7 @@ nav {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("hero_bg.png") center/cover no-repeat !important;
+  background: url("/assets/hero_bg.png") center/cover no-repeat !important;
   opacity: 0.35;
   filter: contrast(1.1) brightness(0.9);
   mix-blend-mode: overlay;
@@ -1166,7 +1166,7 @@ footer {
 
 /* Hero Background Override */
 #hero::before {
-  background: url("hero_bg.png") center/cover no-repeat !important;
+  background: url("/assets/hero_bg.png") center/cover no-repeat !important;
   opacity: 0.35;
   filter: contrast(1.1) brightness(0.9);
   mix-blend-mode: overlay;

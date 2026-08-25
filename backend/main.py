@@ -63,14 +63,30 @@ from fastapi.responses import FileResponse
 # ===== FRONTEND SERVING =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
+DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
 
-# Serve frontend static assets (CSS, JS, images)
-app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+if os.path.exists(DIST_DIR):
+    # Serve React production build files
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
+    
+    @app.get("/favicon.svg")
+    def serve_favicon():
+        return FileResponse(os.path.join(DIST_DIR, "favicon.svg"))
 
-# Serve index.html at root /
-@app.get("/")
-def serve_index():
-    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+    @app.get("/icons.svg")
+    def serve_icons():
+        return FileResponse(os.path.join(DIST_DIR, "icons.svg"))
+
+    @app.get("/")
+    def serve_index():
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
+else:
+    # Serve vanilla/dev files fallback
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+    
+    @app.get("/")
+    def serve_index():
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 # ===== RUN SERVER =====
 if __name__ == "__main__":
