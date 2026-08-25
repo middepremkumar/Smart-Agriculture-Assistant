@@ -20,7 +20,24 @@ model = None
 if GEMINI_API_KEY and genai:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Determine available models to select the best match
+        available = []
+        try:
+            available = [m.name.split("/")[-1] for m in genai.list_models()]
+        except Exception as list_err:
+            print(f"Gemini model list failed: {list_err}")
+
+        # Choose preferred flash model from list
+        selected_model = "gemini-2.5-flash"
+        preferred = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-1.5-flash"]
+        for p_model in preferred:
+            if p_model in available:
+                selected_model = p_model
+                break
+                
+        print(f"Initializing GenerativeModel using model: {selected_model}")
+        model = genai.GenerativeModel(selected_model)
     except Exception as e:
         print(f"Failed to configure Gemini: {e}")
         model = None
