@@ -89,12 +89,24 @@ else:
         return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 import google.generativeai as genai
+import os
 @app.get("/api/debug/version")
 def debug_version():
     try:
-        return {"version": genai.__version__}
+        GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+        genai.configure(api_key=GEMINI_API_KEY)
+        models = [m.name for m in genai.list_models()]
+        return {
+            "version": genai.__version__,
+            "api_key_len": len(GEMINI_API_KEY),
+            "available_models": models
+        }
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "version": genai.__version__,
+            "api_key_len": len(os.environ.get("GEMINI_API_KEY", "")),
+            "error": str(e)
+        }
 
 # ===== RUN SERVER =====
 if __name__ == "__main__":
