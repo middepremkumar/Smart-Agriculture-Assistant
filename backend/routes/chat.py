@@ -29,8 +29,8 @@ if GEMINI_API_KEY and genai:
             print(f"Gemini model list failed: {list_err}")
 
         # Choose preferred flash model from list
-        selected_model = "gemini-2.5-flash"
-        preferred = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-1.5-flash"]
+        selected_model = "gemini-3.6-flash"
+        preferred = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
         for p_model in preferred:
             if p_model in available:
                 selected_model = p_model
