@@ -3,7 +3,8 @@ import {
   Leaf, ShieldCheck, Thermometer, Bot, TrendingUp, IndianRupee, Sprout, 
   Microscope, CloudSun, BarChart2, TestTube, ClipboardList, Globe, 
   MapPin, Camera, AlertTriangle, CheckCircle, Banknote, Droplet, 
-  Smartphone, RefreshCw, Mic, Volume2, ChevronUp, X, Menu, Check
+  Smartphone, RefreshCw, Mic, Volume2, ChevronUp, X, Menu, Check,
+  Search, Navigation, Sliders, ChevronDown, Layers
 } from 'lucide-react';
 
 // ================================================
@@ -142,11 +143,22 @@ function App() {
   const [showKeyInput, setShowKeyInput] = useState(false);
 
   // Land Valuation States
-  const [landState, setLandState] = useState("");
-  const [landArea, setLandArea] = useState("");
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+  const landAreaRef = useRef(2.5);
+  const [selectedCoords, setSelectedCoords] = useState({ lat: 15.8281, lon: 78.0373 });
+  const [landAreaSlider, setLandAreaSlider] = useState(2.5);
+  const [landInspectionData, setLandInspectionData] = useState(null);
+  const [landInspectLoading, setLandInspectLoading] = useState(false);
+  const [mapSearchQuery, setMapSearchQuery] = useState("");
+  const [searchingMap, setSearchingMap] = useState(false);
+  const [showManualLandForm, setShowManualLandForm] = useState(false);
+
+  const [landState, setLandState] = useState("AP");
+  const [landArea, setLandArea] = useState("2.5");
   const [landSoil, setLandSoil] = useState("1");
-  const [landIrrigation, setLandIrrigation] = useState("1");
-  const [landRoad, setLandRoad] = useState("");
+  const [landIrrigation, setLandIrrigation] = useState("2");
+  const [landRoad, setLandRoad] = useState("1.38");
   const [landResult, setLandResult] = useState(null);
   const [landEstimating, setLandEstimating] = useState(false);
 
@@ -716,7 +728,214 @@ function App() {
     }
   };
 
-  // Land valuation estimator
+  // Indian currency formatting helper
+  const formatIndianCurrency = (num) => {
+    if (!num && num !== 0) return "₹0";
+    const n = Math.round(Number(num));
+    if (n >= 10000000) {
+      return `₹${(n / 10000000).toFixed(2)} Cr`;
+    } else if (n >= 100000) {
+      return `₹${(n / 100000).toFixed(2)} Lakhs`;
+    }
+    return `₹${n.toLocaleString("en-IN")}`;
+  };
+
+  // Spatial inspection of farm coordinates
+  const inspectLand = async (lat, lon, area) => {
+    const acres = area !== undefined ? parseFloat(area) : (landAreaRef.current || 2.5);
+    setSelectedCoords({ lat, lon });
+    setLandInspectLoading(true);
+    try {
+      const res = await fetch("/api/predict/land/inspect-coords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: parseFloat(lat),
+          lon: parseFloat(lon),
+          area_acres: acres
+        })
+      });
+      const data = await res.json();
+      if (res.status === 200) {
+        setLandInspectionData(data);
+        setLandResult(data.valuation);
+        setLandState(data.detected_state || "AP");
+        setLandArea(acres.toString());
+        if (data.detected_soil?.code) {
+          setLandSoil(data.detected_soil.code.toString());
+        }
+        if (data.detected_irrigation?.code) {
+          setLandIrrigation(data.detected_irrigation.code.toString());
+        }
+        if (data.road_distance_km !== undefined) {
+          setLandRoad(data.road_distance_km.toString());
+        }
+      } else {
+        console.error("Land inspect error:", data);
+      }
+    } catch (err) {
+      console.error("Land inspect request failed:", err);
+    } finally {
+      setLandInspectLoading(false);
+    }
+  };
+
+  const jumpToLocation = (lat, lon, zoom = 14) => {
+    if (mapRef.current) {
+      mapRef.current.flyTo([lat, lon], zoom, { duration: 1.2 });
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lon]);
+      }
+    }
+    inspectLand(lat, lon, landAreaRef.current);
+  };
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        jumpToLocation(latitude, longitude, 15);
+      },
+      (err) => {
+        alert("Could not access GPS location. Please click directly on the satellite map or search your town.");
+      }
+    );
+  };
+
+  const handleMapSearch = async (e) => {
+    if (e) e.preventDefault();
+    if (!mapSearchQuery.trim()) return;
+    setSearchingMap(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(mapSearchQuery + ", India")}&limit=1`);
+      const results = await res.json();
+      if (results && results.length > 0) {
+        const lat = parseFloat(results[0].lat);
+        const lon = parseFloat(results[0].lon);
+        jumpToLocation(lat, lon, 14);
+      } else {
+        alert("Location not found. Try searching a district, mandal, or village name.");
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+      alert("Search failed: " + err.message);
+    } finally {
+      setSearchingMap(false);
+    }
+  };
+
+  const handleAreaSliderChange = (newArea) => {
+    const val = parseFloat(newArea);
+    setLandAreaSlider(val);
+    landAreaRef.current = val;
+    setLandArea(val.toString());
+    if (landInspectionData && landInspectionData.valuation) {
+      const perAcre = landInspectionData.valuation.per_acre || 0;
+      const newTotal = Math.round(perAcre * val);
+      setLandInspectionData(prev => ({
+        ...prev,
+        area_acres: val,
+        valuation: {
+          ...prev.valuation,
+          total_value: newTotal,
+          total_formatted: formatIndianCurrency(newTotal),
+        }
+      }));
+    }
+  };
+
+  // Initialize Satellite Leaflet Map
+  useEffect(() => {
+    let checkTimer;
+    const initMap = () => {
+      const mapContainer = document.getElementById("land-map");
+      if (!mapContainer || mapRef.current) return;
+      if (typeof window === "undefined" || !window.L) {
+        checkTimer = setTimeout(initMap, 200);
+        return;
+      }
+
+      if (mapContainer._leaflet_id) {
+        mapContainer._leaflet_id = null;
+      }
+
+      const initialLat = 15.8281;
+      const initialLon = 78.0373;
+
+      const map = window.L.map("land-map", {
+        center: [initialLat, initialLon],
+        zoom: 13,
+        zoomControl: true,
+        scrollWheelZoom: true,
+      });
+
+      // Esri Satellite Imagery
+      window.L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          maxZoom: 19,
+          attribution: "Esri Satellite"
+        }
+      ).addTo(map);
+
+      // Esri Labels & Boundaries
+      window.L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+        {
+          maxZoom: 19,
+          opacity: 0.85
+        }
+      ).addTo(map);
+
+      // Custom pulsing radar pin
+      const radarIcon = window.L.divIcon({
+        className: "custom-radar-pin",
+        html: `
+          <div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <div class="pin-radar-ring"></div>
+            <div class="pin-dot"></div>
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
+      const marker = window.L.marker([initialLat, initialLon], { icon: radarIcon }).addTo(map);
+      markerRef.current = marker;
+      mapRef.current = map;
+
+      // Invalidate size after mount to ensure crisp layout
+      setTimeout(() => {
+        if (mapRef.current) mapRef.current.invalidateSize();
+      }, 350);
+
+      // Inspect initial coordinates
+      inspectLand(initialLat, initialLon, landAreaRef.current);
+
+      // Map click handler
+      map.on("click", (e) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        inspectLand(lat, lng, landAreaRef.current);
+      });
+    };
+
+    initMap();
+
+    return () => {
+      if (checkTimer) clearTimeout(checkTimer);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Manual land valuation estimator
   const handleLandEstimate = async (e) => {
     e.preventDefault();
     if (!landState || !landArea) {
@@ -739,6 +958,17 @@ function App() {
       const data = await res.json();
       if (res.status === 200) {
         setLandResult(data);
+        if (landInspectionData) {
+          setLandInspectionData(prev => ({
+            ...prev,
+            area_acres: parseFloat(landArea),
+            valuation: {
+              ...data,
+              total_formatted: formatIndianCurrency(data.total_value),
+              per_acre_formatted: formatIndianCurrency(data.per_acre),
+            }
+          }));
+        }
       } else {
         alert("Valuation failed: " + data.detail);
       }
@@ -1371,119 +1601,300 @@ function App() {
         </div>
       </section>
 
-      {/* ===== LAND PRICE PREDICTION ===== */}
+      {/* ===== SATELLITE LAND PRICE & SPATIAL AI ===== */}
       <section id="land" className="tool-section">
         <div className="container">
-          <div className="tool-layout">
-            <div className="tool-content text-left">
-              <div className="tool-badge">
-                <span className="badge badge-earth">
-                  <IndianRupee size={14} style={{ display: "inline", marginRight: "4px", verticalAlign: "middle" }} /> ML Regression
-                </span>
-              </div>
-              <h2 className="tool-title">Land Price<br />Estimator</h2>
-              <p className="tool-desc">
-                Get an estimated land valuation based on location, land size,
-                irrigation type, soil quality, and proximity to roads. Powered by
-                a Gradient Boosting regressor.
-              </p>
+          <div className="section-header text-center" style={{ marginBottom: "2rem" }}>
+            <div className="tool-badge" style={{ display: "inline-block", marginBottom: "8px" }}>
+              <span className="badge badge-earth">
+                <Globe size={14} style={{ display: "inline", marginRight: "4px", verticalAlign: "middle" }} />
+                Spatial Satellite AI • 1-Click Valuation
+              </span>
             </div>
-            <div className="tool-card" onMouseMove={handleCardMouseMove}>
-              <div className="spotlight"></div>
-              <h4 style={{ textAlign: "left" }}>Land Details</h4>
-              <form onSubmit={handleLandEstimate} style={{ textAlign: "left" }}>
-                <div className="form-group">
-                  <select 
-                    className="form-select" 
-                    value={landState} 
-                    onChange={(e) => setLandState(e.target.value)}
-                    required
+            <h2 className="section-title">Satellite Land Price & Soil Estimator</h2>
+            <p className="section-desc" style={{ maxWidth: "780px", margin: "0 auto" }}>
+              Click or tap on any agricultural land or farm parcel across India. Our spatial intelligence automatically calculates highway/road distance, detects aquifer irrigation potential, and classifies regional agro-ecological soil zones to generate an accurate ML market valuation.
+            </p>
+          </div>
+
+          <div className="land-layout">
+            {/* LEFT COLUMN: SATELLITE MAP */}
+            <div className="land-map-wrapper">
+              {/* Map controls overlay */}
+              <div className="map-control-overlay">
+                <form onSubmit={handleMapSearch} className="map-search-bar">
+                  <Search size={16} color="#2ecc71" style={{ alignSelf: "center" }} />
+                  <input
+                    type="text"
+                    className="map-search-input"
+                    placeholder="Search district, mandal, or village in India (e.g., Kurnool, Warangal)..."
+                    value={mapSearchQuery}
+                    onChange={(e) => setMapSearchQuery(e.target.value)}
+                  />
+                  <button 
+                    type="submit" 
+                    className="btn-primary" 
+                    style={{ padding: "4px 12px", fontSize: "0.78rem", minHeight: "unset", borderRadius: "99px" }}
+                    disabled={searchingMap}
                   >
-                    <option value="">Select State</option>
-                    <option value="AP">Andhra Pradesh</option>
-                    <option value="TS">Telangana</option>
-                    <option value="KA">Karnataka</option>
-                    <option value="TN">Tamil Nadu</option>
-                    <option value="MH">Maharashtra</option>
-                    <option value="UP">Uttar Pradesh</option>
-                  </select>
-                  <label className="form-label" style={{ transform: landState ? "translateY(-18px) scale(0.85)" : "none" }}>State / Region</label>
+                    {searchingMap ? <span className="spinner" style={{ width: "12px", height: "12px" }}></span> : "Search"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLocateMe}
+                    title="Find My Location"
+                    className="btn-glass"
+                    style={{ padding: "4px 10px", fontSize: "0.78rem", minHeight: "unset", borderRadius: "99px", display: "flex", alignItems: "center", gap: "4px" }}
+                  >
+                    <Navigation size={12} color="#2ecc71" /> Locate Me
+                  </button>
+                </form>
+
+                {/* Quick Indian Agricultural Hubs */}
+                <div className="map-quick-tags">
+                  <span style={{ fontSize: "0.7rem", color: "var(--gray-300)", alignSelf: "center", marginRight: "2px" }}>Quick Hubs:</span>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(15.8281, 78.0373)}>Kurnool, AP</button>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(16.3067, 80.4365)}>Guntur, AP</button>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(17.9689, 79.5941)}>Warangal, TS</button>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(11.0168, 76.9558)}>Coimbatore, TN</button>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(19.9975, 73.7898)}>Nashik, MH</button>
+                  <button type="button" className="map-tag-btn" onClick={() => jumpToLocation(30.9010, 75.8573)}>Ludhiana, PB</button>
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={landArea}
-                      onChange={(e) => setLandArea(e.target.value)}
-                      placeholder=" "
-                      step="0.1"
-                      min="0.1"
-                      required
-                    />
-                    <label className="form-label">Area (Acres)</label>
-                  </div>
-                  <div className="form-group">
-                    <select 
-                      className="form-select"
-                      value={landSoil}
-                      onChange={(e) => setLandSoil(e.target.value)}
-                    >
-                      <option value="1">Black</option>
-                      <option value="2">Red</option>
-                      <option value="3">Loamy</option>
-                      <option value="4">Sandy</option>
-                      <option value="5">Alluvial</option>
-                    </select>
-                    <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Soil Type</label>
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <select 
-                      className="form-select"
-                      value={landIrrigation}
-                      onChange={(e) => setLandIrrigation(e.target.value)}
-                    >
-                      <option value="1">Canal</option>
-                      <option value="2">Borewell</option>
-                      <option value="3">Rain-fed</option>
-                      <option value="4">Drip</option>
-                    </select>
-                    <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Irrigation</label>
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={landRoad}
-                      onChange={(e) => setLandRoad(e.target.value)}
-                      placeholder=" "
-                      step="0.1"
-                      min="0"
-                    />
-                    <label className="form-label">Road Distance (km)</label>
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  style={{ width: "100%", marginTop: "8px" }}
-                  disabled={landEstimating}
-                >
-                  {landEstimating ? <span className="spinner"></span> : <IndianRupee size={14} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />} 
-                  Estimate Value
-                </button>
-              </form>
-              {landResult && (
-                <div className="result-box visible" style={{ textAlign: "left" }}>
-                  <div className="result-title">Estimated Land Value</div>
-                  <div className="result-value">₹{landResult.total_value.toLocaleString("en-IN")}</div>
-                  <div className="result-sub">
-                    ≈ ₹{landResult.per_acre.toLocaleString("en-IN")} per acre | Confidence: {landResult.confidence}
-                  </div>
+              </div>
+
+              {/* The Leaflet Canvas */}
+              <div id="land-map"></div>
+
+              {/* Click instruction floating pill */}
+              <div className="map-click-hint">
+                <MapPin size={13} color="#2ecc71" />
+                <span>Click anywhere on farmland to inspect instantly</span>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: LIVE INSPECTION & VALUATION CARD */}
+            <div className="inspection-card" style={{ position: "relative" }}>
+              {landInspectLoading && (
+                <div className="land-scanner-overlay">
+                  <div className="spinner" style={{ width: "24px", height: "24px" }}></div>
+                  <div className="land-scanner-line"></div>
+                  <span>Inspecting satellite telemetry & soil grid...</span>
                 </div>
               )}
+
+              {/* Location & GPS Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--gray-300)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Detected Farm Location
+                  </div>
+                  <h3 style={{ margin: "2px 0 0 0", fontSize: "1.15rem", fontWeight: "700", color: "#fff" }}>
+                    {landInspectionData?.place_name || "Pinpointed Farm Parcel"}
+                  </h3>
+                </div>
+                <div className="badge badge-earth" style={{ fontSize: "0.72rem", padding: "4px 8px", whiteSpace: "nowrap" }}>
+                  📍 {selectedCoords.lat.toFixed(4)}, {selectedCoords.lon.toFixed(4)}
+                </div>
+              </div>
+
+              {/* Valuation Hero Box */}
+              <div className="land-inspect-hero">
+                <div style={{ fontSize: "0.75rem", color: "var(--gray-300)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Estimated Fair Market Valuation
+                </div>
+                <div className="land-val-total">
+                  {landInspectionData?.valuation?.total_formatted || formatIndianCurrency(landInspectionData?.valuation?.total_value || 0)}
+                </div>
+                <div className="land-val-sub">
+                  <span><strong>{landInspectionData?.valuation?.per_acre_formatted || "₹0 / Acre"}</strong> per acre</span>
+                  <span>•</span>
+                  <span className="land-val-badge">
+                    {landInspectionData?.valuation?.confidence || "High Accuracy"} Confidence
+                  </span>
+                </div>
+              </div>
+
+              {/* Dynamic Acreage Slider */}
+              <div className="land-slider-box">
+                <label>
+                  <span>Selected Farm Size</span>
+                  <span style={{ color: "#2ecc71", fontSize: "0.95rem" }}>{landAreaSlider} Acres</span>
+                </label>
+                <input
+                  type="range"
+                  min="0.25"
+                  max="50"
+                  step="0.25"
+                  value={landAreaSlider}
+                  onChange={(e) => handleAreaSliderChange(e.target.value)}
+                />
+                <div className="land-slider-presets">
+                  {[0.5, 1, 2.5, 5, 10, 25].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      className={`preset-chip ${landAreaSlider === preset ? "active" : ""}`}
+                      onClick={() => handleAreaSliderChange(preset)}
+                    >
+                      {preset} Ac
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Detected Spatial Intelligence Grid */}
+              <div className="feature-badge-row">
+                <div className="feature-pill">
+                  <div className="feature-pill-label">Nearest Road Distance</div>
+                  <div className="feature-pill-val">
+                    {landInspectionData?.road_distance_km !== undefined ? `${landInspectionData.road_distance_km} km` : "Detecting..."}
+                  </div>
+                  <div className="feature-pill-sub">
+                    {landInspectionData?.road_access_level || (landInspectionData?.road_distance_km <= 0.5 ? "Immediate Access" : landInspectionData?.road_distance_km <= 2 ? "Good Rural Access" : "Interior Farm Track")}
+                  </div>
+                </div>
+
+                <div className="feature-pill">
+                  <div className="feature-pill-label">Irrigation & Aquifer</div>
+                  <div className="feature-pill-val">
+                    {landInspectionData?.detected_irrigation?.name || "Borewell Potential"}
+                  </div>
+                  <div className="feature-pill-sub">
+                    {landInspectionData?.detected_irrigation?.type || "Groundwater Source"}
+                  </div>
+                </div>
+
+                <div className="feature-pill">
+                  <div className="feature-pill-label">Regional Soil Classification</div>
+                  <div className="feature-pill-val">
+                    {landInspectionData?.detected_soil?.name || "Black Soil"}
+                  </div>
+                  <div className="feature-pill-sub">
+                    {landInspectionData?.detected_soil?.fertility || "High Moisture Retention"}
+                  </div>
+                </div>
+
+                <div className="feature-pill">
+                  <div className="feature-pill-label">Administrative Zone</div>
+                  <div className="feature-pill-val">
+                    {landInspectionData?.detected_state_name || landInspectionData?.detected_state || "Andhra Pradesh"}
+                  </div>
+                  <div className="feature-pill-sub">
+                    Agro-Climatic Reg. Zone
+                  </div>
+                </div>
+              </div>
+
+              {/* Manual Override / Tuning Accordion */}
+              <div>
+                <button
+                  type="button"
+                  className="land-accordion-toggle"
+                  onClick={() => setShowManualLandForm(!showManualLandForm)}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Sliders size={14} color="#2ecc71" />
+                    Fine-tune attributes or override manually
+                  </span>
+                  {showManualLandForm ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+
+                {showManualLandForm && (
+                  <form onSubmit={handleLandEstimate} style={{ marginTop: "12px", background: "rgba(0,0,0,0.2)", padding: "14px", borderRadius: "var(--radius-sm)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="form-group" style={{ marginBottom: "10px" }}>
+                      <select 
+                        className="form-select" 
+                        value={landState} 
+                        onChange={(e) => setLandState(e.target.value)}
+                        required
+                      >
+                        <option value="">Select State</option>
+                        <option value="AP">Andhra Pradesh</option>
+                        <option value="TS">Telangana</option>
+                        <option value="KA">Karnataka</option>
+                        <option value="TN">Tamil Nadu</option>
+                        <option value="MH">Maharashtra</option>
+                        <option value="UP">Uttar Pradesh</option>
+                        <option value="PB">Punjab</option>
+                        <option value="RJ">Rajasthan</option>
+                        <option value="GJ">Gujarat</option>
+                      </select>
+                      <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>State / Region</label>
+                    </div>
+
+                    <div className="form-row" style={{ marginBottom: "10px" }}>
+                      <div className="form-group">
+                        <input
+                          type="number"
+                          className="form-input"
+                          value={landArea}
+                          onChange={(e) => {
+                            setLandArea(e.target.value);
+                            if (e.target.value) setLandAreaSlider(parseFloat(e.target.value));
+                          }}
+                          placeholder=" "
+                          step="0.1"
+                          min="0.1"
+                          required
+                        />
+                        <label className="form-label">Area (Acres)</label>
+                      </div>
+                      <div className="form-group">
+                        <select 
+                          className="form-select"
+                          value={landSoil}
+                          onChange={(e) => setLandSoil(e.target.value)}
+                        >
+                          <option value="1">Black Cotton Soil</option>
+                          <option value="2">Red Soil</option>
+                          <option value="3">Loamy Soil</option>
+                          <option value="4">Sandy Soil</option>
+                          <option value="5">Alluvial Soil</option>
+                        </select>
+                        <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Soil Type</label>
+                      </div>
+                    </div>
+
+                    <div className="form-row" style={{ marginBottom: "12px" }}>
+                      <div className="form-group">
+                        <select 
+                          className="form-select"
+                          value={landIrrigation}
+                          onChange={(e) => setLandIrrigation(e.target.value)}
+                        >
+                          <option value="1">Canal Irrigated</option>
+                          <option value="2">Borewell Irrigated</option>
+                          <option value="3">Rain-fed</option>
+                          <option value="4">Drip Irrigated</option>
+                        </select>
+                        <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Irrigation</label>
+                      </div>
+                      <div className="form-group">
+                        <input
+                          type="number"
+                          className="form-input"
+                          value={landRoad}
+                          onChange={(e) => setLandRoad(e.target.value)}
+                          placeholder=" "
+                          step="0.1"
+                          min="0"
+                        />
+                        <label className="form-label">Road Distance (km)</label>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      style={{ width: "100%", padding: "8px" }}
+                      disabled={landEstimating}
+                    >
+                      {landEstimating ? <span className="spinner"></span> : <IndianRupee size={14} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />} 
+                      Recalculate Value
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>
