@@ -20,6 +20,8 @@ BASE_PRICES = {
 SOIL_MULT   = {1: 1.2, 2: 0.9, 3: 1.1, 4: 0.8, 5: 1.3}
 IRR_MULT    = {1: 1.3, 2: 1.1, 3: 0.8, 4: 1.2}
 
+STATE_MAP = {"AP": 0, "TS": 1, "KA": 2, "TN": 3, "MH": 4, "UP": 5, "RJ": 6, "GJ": 7, "PB": 8}
+
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "../ml_models/land_model.pkl")
 land_model = None
 try:
@@ -33,7 +35,7 @@ def predict_land(data: LandInput):
     """Estimate land price using ML model or formula fallback."""
     try:
         if land_model:
-            state_enc = hash(data.state) % 20  # Encode state as number
+            state_enc = STATE_MAP.get(data.state.upper(), 0)
             features = np.array([[
                 state_enc, data.area_acres, data.soil_type,
                 data.irrigation, data.road_km

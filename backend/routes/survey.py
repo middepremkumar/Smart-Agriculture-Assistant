@@ -36,15 +36,15 @@ def submit_survey(data: SurveyData):
 
     # Load existing responses
     try:
-        with open(SURVEY_FILE, "r") as f:
+        with open(SURVEY_FILE, "r", encoding="utf-8") as f:
             responses = json.load(f)
     except: responses = []
 
     responses.append(response)
 
     # Save updated list
-    with open(SURVEY_FILE, "w") as f:
-        json.dump(responses, f, indent=2)
+    with open(SURVEY_FILE, "w", encoding="utf-8") as f:
+        json.dump(responses, f, indent=2, ensure_ascii=False)
 
     return {
         "message": "Survey submitted successfully. Thank you!",
@@ -56,7 +56,7 @@ def submit_survey(data: SurveyData):
 def get_survey_stats():
     """Get aggregated survey statistics for admin dashboard."""
     try:
-        with open(SURVEY_FILE, "r") as f:
+        with open(SURVEY_FILE, "r", encoding="utf-8") as f:
             responses = json.load(f)
     except: responses = []
 

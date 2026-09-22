@@ -21,6 +21,22 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 
+# Load .env file automatically if present
+env_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))
+if os.path.exists(env_file):
+    try:
+        with open(env_file, "r", encoding="utf-8") as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith("#") and "=" in _line:
+                    _k, _v = _line.split("=", 1)
+                    _k = _k.strip()
+                    _v = _v.strip().strip('"').strip("'")
+                    if _k and _k not in os.environ:
+                        os.environ[_k] = _v
+    except Exception as _e:
+        print(f"Note: Error reading .env: {_e}")
+
 # Import route modules
 from backend.routes.crop import router as crop_router
 from backend.routes.disease import router as disease_router

@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter
+from fastapi import APIRouter
 import random
 from datetime import datetime
 
@@ -48,7 +48,7 @@ def get_market_prices(category: str = "all"):
             "category": crop["category"],
             "market":   crop["market"],
             "price":    price,
-            "unit":     "â‚¹/quintal",
+            "unit":     "₹/quintal",
             "change":   change,
             "updated":  today
         })

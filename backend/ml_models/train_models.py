@@ -131,8 +131,9 @@ print("\n🏡 Training Land Price Model...")
 # In production: collect real transaction data from state registration offices
 np.random.seed(123)
 n = 3000
-STATE_CODES = ["AP", "TS", "KA", "TN", "MH", "UP"]
-BASE = {"AP": 800000, "TS": 750000, "KA": 950000, "TN": 1100000, "MH": 1200000, "UP": 450000}
+STATE_CODES = ["AP", "TS", "KA", "TN", "MH", "UP", "RJ", "GJ", "PB"]
+STATE_MAP = {s: i for i, s in enumerate(STATE_CODES)}
+BASE = {"AP": 800000, "TS": 750000, "KA": 950000, "TN": 1100000, "MH": 1200000, "UP": 450000, "RJ": 380000, "GJ": 900000, "PB": 1300000}
 SOIL  = {1: 1.2, 2: 0.9, 3: 1.1, 4: 0.8, 5: 1.3}
 IRR   = {1: 1.3, 2: 1.1, 3: 0.8, 4: 1.2}
 
@@ -148,7 +149,7 @@ for _ in range(n):
     price    = BASE[state] * area * SOIL[soil_t] * IRR[irr_t] * road_f * noise
 
     rows.append({
-        "state_code": hash(state) % 20,
+        "state_code": STATE_MAP.get(state, 0),
         "area":       area,
         "soil_type":  soil_t,
         "irrigation": irr_t,

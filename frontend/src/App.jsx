@@ -138,6 +138,8 @@ function App() {
   const [diseasePreview, setDiseasePreview] = useState(null);
   const [diseaseResult, setDiseaseResult] = useState(null);
   const [diseaseAnalyzing, setDiseaseAnalyzing] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState(localStorage.getItem("gemini_api_key") || "");
+  const [showKeyInput, setShowKeyInput] = useState(false);
 
   // Land Valuation States
   const [landState, setLandState] = useState("");
@@ -248,6 +250,14 @@ function App() {
 
     // Load initial market list
     fetchMarketPrices(marketFilter);
+
+    // Initial live weather prefetch so weather display is active immediately on load
+    fetchWeatherDirect("Kurnool").then((wData) => {
+      if (wData) {
+        setWeatherCity("Kurnool");
+        predictCrop("Kurnool", wData);
+      }
+    });
 
     // Initial voice prompt
     setBotBubbleText(t("voice_prompt"));
@@ -394,7 +404,7 @@ function App() {
 
     const baseRainfall = seededValue(locSeed, 45, 210, 5);
 
-    const activeWeather = weatherObj || weatherData;
+    const activeWeather = weatherObj || weatherDataRef.current || weatherData;
 
     if (activeWeather) {
       tVal = activeWeather.temperature;
@@ -440,6 +450,20 @@ function App() {
     }
   };
 
+  // Explicitly fetch and apply real-time weather to crop recommendation
+  const handleTakeRealtimeWeather = async () => {
+    setCropPredicting(true);
+    const targetCity = weatherCity.trim() || (userLocation !== "Unknown" ? userLocation.split(",")[0].trim() : "Kurnool");
+    const freshWeather = await fetchWeatherDirect(targetCity);
+    if (freshWeather) {
+      setWeatherData(freshWeather);
+      weatherDataRef.current = freshWeather;
+      await predictCrop(freshWeather.city, freshWeather);
+    } else {
+      await predictCrop(targetCity);
+    }
+  };
+
   // Sync crop top N changes
   useEffect(() => {
     if (userLocation !== "Unknown" || weatherData !== null) {
@@ -479,21 +503,46 @@ function App() {
 
     const fallbackToIP = async () => {
       try {
-        const res = await fetchWithTimeout("https://ipapi.co/json/");
-        const data = await res.json();
-        if (data.city) {
-          await handleSuccess(data.city, data.region);
-        } else {
-          throw new Error("No city returned from IP");
+        let city = "";
+        let region = "";
+
+        // Primary IP service: ipwho.is (reliable, free, non-rate-limited)
+        try {
+          const res = await fetchWithTimeout("https://ipwho.is/", 5000);
+          const data = await res.json();
+          if (data && data.success !== false && data.city) {
+            city = data.city;
+            region = data.region || "";
+          }
+        } catch (e1) {
+          console.warn("ipwho.is lookup failed, trying secondary:", e1);
         }
+
+        // Secondary IP service: ipapi.co
+        if (!city) {
+          try {
+            const res = await fetchWithTimeout("https://ipapi.co/json/", 4000);
+            const data = await res.json();
+            if (data && data.city && !data.error) {
+              city = data.city;
+              region = data.region || "";
+            }
+          } catch (e2) {
+            console.warn("ipapi.co lookup failed:", e2);
+          }
+        }
+
+        // Guaranteed fallback city
+        if (!city) {
+          city = "Kurnool";
+          region = "Andhra Pradesh";
+        }
+
+        await handleSuccess(city, region);
       } catch (e) {
         console.error("IP Location Error:", e);
         setLocationLoading(false);
-        speakText(
-          "Unable to detect location. Please enter your city manually.",
-          currentLangRef.current === "te" ? "te-IN" : "en-US"
-        );
-        triggerManualInputFallback();
+        await handleSuccess("Kurnool", "Andhra Pradesh");
       }
     };
 
@@ -507,7 +556,8 @@ function App() {
         const { latitude: lat, longitude: lon } = pos.coords;
         try {
           const res = await fetchWithTimeout(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`,
+            5000
           );
           const data = await res.json();
           const addr = data.address || {};
@@ -520,10 +570,10 @@ function App() {
         }
       },
       async (err) => {
-        console.warn("GPS coordinate access denied:", err.message);
+        console.warn("GPS coordinate access not granted or timed out:", err.message);
         await fallbackToIP();
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 6000, enableHighAccuracy: false }
     );
   };
 
@@ -608,6 +658,16 @@ function App() {
   };
 
   // Leaf Disease image handler
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -618,7 +678,8 @@ function App() {
 
   const handleDiseaseDrop = (e) => {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
+    e.stopPropagation();
+    const file = e.dataTransfer?.files?.[0];
     if (file && file.type.startsWith("image/")) {
       setDiseaseFile(file);
       setDiseasePreview(URL.createObjectURL(file));
@@ -631,9 +692,15 @@ function App() {
     setDiseaseAnalyzing(true);
     const formData = new FormData();
     formData.append("file", diseaseFile);
+    if (geminiApiKey) {
+      formData.append("custom_gemini_key", geminiApiKey);
+    }
     try {
+      const headers = {};
+      if (geminiApiKey) headers["x-gemini-key"] = geminiApiKey;
       const res = await fetch("/api/predict/disease", {
         method: "POST",
+        headers,
         body: formData,
       });
       const data = await res.json();
@@ -1072,15 +1139,26 @@ function App() {
                 </div>
               )}
 
-              <button
-                className="btn-primary"
-                style={{ width: "100%", marginTop: "8px", marginBottom: "16px" }}
-                onClick={() => predictCrop()}
-                disabled={cropPredicting}
-              >
-                {cropPredicting ? <span className="spinner"></span> : <RefreshCw size={14} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />} 
-                Refresh Recommendations
-              </button>
+              <div style={{ display: "flex", gap: "10px", marginTop: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+                <button
+                  className="btn-primary"
+                  style={{ flex: 1, minWidth: "220px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px 18px" }}
+                  onClick={handleTakeRealtimeWeather}
+                  disabled={cropPredicting}
+                >
+                  {cropPredicting ? <span className="spinner"></span> : <CloudSun size={16} />} 
+                  {currentLang === "te" ? "రియల్-టైమ్ వాతావరణాన్ని తీసుకోండి" : "Take Real-Time Weather"}
+                </button>
+                <button
+                  className="btn-outline"
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "11px 16px" }}
+                  onClick={() => predictCrop()}
+                  disabled={cropPredicting}
+                  title="Recalculate recommendations"
+                >
+                  <RefreshCw size={14} /> {currentLang === "te" ? "రిఫ్రెష్" : "Refresh"}
+                </button>
+              </div>
 
               <div className="result-box visible" style={{ marginTop: 0, display: "block", background: "transparent", border: "none", padding: 0 }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1166,7 +1244,60 @@ function App() {
             </div>
             <div className="tool-card" onMouseMove={handleCardMouseMove}>
               <div className="spotlight"></div>
-              <h4 style={{ textAlign: "left" }}>Upload Leaf Image</h4>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <h4 style={{ margin: 0, textAlign: "left" }}>Upload Leaf Image</h4>
+                <button
+                  type="button"
+                  onClick={() => setShowKeyInput(!showKeyInput)}
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    borderRadius: "6px",
+                    color: geminiApiKey ? "var(--green-400)" : "var(--gray-300)",
+                    fontSize: "0.75rem",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px"
+                  }}
+                  title="Switch between Local 14-species CNN and 1M+ Multimodal Vision AI"
+                >
+                  {geminiApiKey ? "⚡ 1M+ AI Vision Active" : "⚙️ 1M+ Dataset Mode"}
+                </button>
+              </div>
+
+              {showKeyInput && (
+                <div style={{ marginBottom: "12px", padding: "10px 12px", background: "rgba(255,255,255,0.05)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.15)", textAlign: "left" }}>
+                  <label style={{ fontSize: "0.78rem", color: "var(--gray-200)", display: "block", marginBottom: "4px", fontWeight: 500 }}>
+                    Gemini Vision API Key (Unlocks 1M+ Multimodal Dataset for Mango, Guava, Cotton, etc.):
+                  </label>
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <input
+                      type="password"
+                      placeholder="Paste free Gemini API key here..."
+                      value={geminiApiKey}
+                      onChange={(e) => {
+                        setGeminiApiKey(e.target.value);
+                        localStorage.setItem("gemini_api_key", e.target.value);
+                      }}
+                      style={{ flex: 1, padding: "6px 10px", borderRadius: "6px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "0.8rem" }}
+                    />
+                    {geminiApiKey && (
+                      <button
+                        type="button"
+                        onClick={() => { setGeminiApiKey(""); localStorage.removeItem("gemini_api_key"); }}
+                        style={{ padding: "4px 8px", fontSize: "0.75rem", background: "rgba(239, 68, 68, 0.2)", color: "#fca5a5", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-400)", marginTop: "4px" }}>
+                    Get a free API key at <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--green-400)", textDecoration: "underline" }}>aistudio.google.com</a>
+                  </div>
+                </div>
+              )}
               <div
                 className="upload-zone"
                 onDragOver={handleDragOver}
@@ -1217,6 +1348,21 @@ function App() {
                     <span style={{ fontSize: "0.8rem", color: "var(--green-400)", display: "inline-block", marginTop: "6px" }}>
                       Confidence: {diseaseResult.confidence}% | Severity: {diseaseResult.severity}
                     </span>
+                    {diseaseResult.symptoms && (
+                      <div style={{ marginTop: "8px", fontSize: "0.85rem", opacity: 0.9 }}>
+                        <strong>Symptoms:</strong> {diseaseResult.symptoms}
+                      </div>
+                    )}
+                    {diseaseResult.note && (
+                      <div style={{ marginTop: "10px", padding: "8px 12px", background: "rgba(234, 179, 8, 0.12)", borderLeft: "3px solid #eab308", borderRadius: "6px", fontSize: "0.82rem", color: "#fef08a", lineHeight: 1.4 }}>
+                        {diseaseResult.note}
+                      </div>
+                    )}
+                    {diseaseResult.engine && (
+                      <div style={{ marginTop: "8px", fontSize: "0.75rem", opacity: 0.65 }}>
+                        Engine: {diseaseResult.engine}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1416,6 +1562,29 @@ function App() {
                   >
                     {weatherData.farming_advisory}
                   </div>
+                )}
+                {weatherData && (
+                  <button
+                    onClick={() => {
+                      predictCrop(weatherData.city, weatherData);
+                      scrollToSection("#crop");
+                    }}
+                    className="btn-primary"
+                    style={{
+                      width: "100%",
+                      marginTop: "16px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      padding: "12px 18px"
+                    }}
+                  >
+                    <Sprout size={16} />
+                    {currentLang === "te"
+                      ? `ఈ రియల్-టైమ్ వాతావరణంతో పంటను సిఫార్సు చేయండి (${weatherData.temperature}°C)`
+                      : `Use This Real-Time Weather for Crop Recommendation (${weatherData.temperature}°C)`}
+                  </button>
                 )}
               </div>
             </div>
