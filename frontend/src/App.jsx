@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Leaf, ShieldCheck, Thermometer, Bot, TrendingUp, IndianRupee, Sprout, 
   Microscope, CloudSun, BarChart2, TestTube, ClipboardList, Globe, 
@@ -202,6 +202,17 @@ function App() {
   const userLocationRef = useRef(userLocation);
   const weatherDataRef = useRef(weatherData);
 
+  // Stable memoized background floating particles
+  const heroParticles = useMemo(() => {
+    return Array.from({ length: 18 }).map((_, i) => ({
+      id: i,
+      size: Math.round(((i * 7 + 13) % 7) + 3),
+      left: `${((i * 37 + 19) % 94) + 3}%`,
+      animationDuration: `${12 + (i % 8) * 2}s`,
+      animationDelay: `-${(i % 5) * 4}s`
+    }));
+  }, []);
+
   // Keep references updated for async callbacks
   useEffect(() => {
     currentLangRef.current = currentLang;
@@ -271,9 +282,6 @@ function App() {
       }
     });
 
-    // Initial voice prompt
-    setBotBubbleText(t("voice_prompt"));
-
     // Auto-detect location after 1 sec
     const timer = setTimeout(() => {
       autoDetectLocation();
@@ -299,7 +307,6 @@ function App() {
     if (recognitionRef.current) {
       recognitionRef.current.lang = currentLang === "te" ? "te-IN" : "en-IN";
     }
-    setBotBubbleText(t("voice_prompt"));
   }, [currentLang]);
 
   // Speech Recognition setup
@@ -353,20 +360,26 @@ function App() {
   const sendToChatbot = async (text) => {
     setBotBubbleText(currentLangRef.current === "te" ? "ఆలోచిస్తున్నాను..." : "Thinking...");
     try {
+      const headers = { "Content-Type": "application/json" };
+      if (geminiApiKey) {
+        headers["x-gemini-key"] = geminiApiKey;
+      }
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           message: text,
           location: userLocationRef.current,
           weather: weatherDataRef.current ? weatherDataRef.current.description : "Unknown",
+          api_key: geminiApiKey || undefined,
+          language: currentLangRef.current || "te",
         }),
       });
       const data = await res.json();
       setBotBubbleText(data.response);
       speakText(data.response, currentLangRef.current === "te" ? "te-IN" : "en-IN");
     } catch (err) {
-      setBotBubbleText("Sorry, I am having trouble connecting.");
+      setBotBubbleText(currentLangRef.current === "te" ? "నమస్తే, సర్వర్ కనెక్ట్ కావడంలో ఇబ్బందిగా ఉంది." : "Sorry, I am having trouble connecting.");
     }
   };
 
@@ -958,17 +971,55 @@ function App() {
       const data = await res.json();
       if (res.status === 200) {
         setLandResult(data);
-        if (landInspectionData) {
-          setLandInspectionData(prev => ({
+        const stateLabels = {
+          AP: "Andhra Pradesh", TS: "Telangana", KA: "Karnataka",
+          TN: "Tamil Nadu", MH: "Maharashtra", UP: "Uttar Pradesh",
+          PB: "Punjab", RJ: "Rajasthan", GJ: "Gujarat"
+        };
+        const soilLabels = ["Black Cotton Soil", "Red Sandy/Loam", "Loamy Soil", "Sandy / Arid", "Alluvial Soil"];
+        const irrLabels = ["Canal Irrigation", "Borewell / Tube-well", "Rain-fed", "Drip / Micro-irrigation"];
+        const sName = stateLabels[landState] || landState;
+        const soilName = soilLabels[parseInt(landSoil) - 1] || "Agricultural Soil";
+        const irrName = irrLabels[parseInt(landIrrigation) - 1] || "Borewell";
+        const roadDist = parseFloat(landRoad || 0);
+
+        setLandInspectionData(prev => {
+          if (!prev) {
+            return {
+              place_name: `${sName} Farmland Parcel`,
+              detected_state: landState,
+              detected_state_name: sName,
+              area_acres: parseFloat(landArea),
+              road_distance_km: roadDist,
+              road_access_level: `${roadDist} km from Access Road`,
+              detected_soil: { name: soilName, fertility: "Fertile agricultural tract" },
+              detected_irrigation: { name: irrName, type: "Active water source" },
+              valuation: {
+                total_value: data.total_value,
+                total_formatted: data.total_formatted || formatIndianCurrency(data.total_value),
+                per_acre: data.per_acre,
+                per_acre_formatted: data.per_acre_formatted || formatIndianCurrency(data.per_acre),
+                confidence: data.confidence || "High Accuracy"
+              }
+            };
+          }
+          return {
             ...prev,
+            detected_state: landState,
+            detected_state_name: sName,
             area_acres: parseFloat(landArea),
+            road_distance_km: roadDist,
+            road_access_level: `${roadDist} km from Access Road`,
+            detected_soil: { ...prev.detected_soil, name: soilName },
+            detected_irrigation: { ...prev.detected_irrigation, name: irrName },
             valuation: {
+              ...prev.valuation,
               ...data,
-              total_formatted: formatIndianCurrency(data.total_value),
-              per_acre_formatted: formatIndianCurrency(data.per_acre),
+              total_formatted: data.total_formatted || formatIndianCurrency(data.total_value),
+              per_acre_formatted: data.per_acre_formatted || formatIndianCurrency(data.per_acre),
             }
-          }));
-        }
+          };
+        });
       } else {
         alert("Valuation failed: " + data.detail);
       }
@@ -1108,22 +1159,19 @@ function App() {
       <section id="home">
         <div id="hero">
           <div className="particles">
-            {Array.from({ length: 18 }).map((_, i) => {
-              const size = Math.random() * 6 + 3;
-              return (
-                <div 
-                  key={i} 
-                  className="particle" 
-                  style={{
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    left: `${Math.random() * 100}%`,
-                    animationDuration: `${Math.random() * 15 + 10}s`,
-                    animationDelay: `${Math.random() * -20}s`
-                  }} 
-                />
-              );
-            })}
+            {heroParticles.map((p) => (
+              <div 
+                key={p.id} 
+                className="particle" 
+                style={{
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  left: p.left,
+                  animationDuration: p.animationDuration,
+                  animationDelay: p.animationDelay
+                }} 
+              />
+            ))}
           </div>
           <div className="container">
             <div className="hero-content text-left">
@@ -2507,7 +2555,7 @@ function App() {
       <div className="voice-bot">
         {showBotBubble && (
           <div className="bot-bubble" id="botBubble" style={{ display: "block" }}>
-            {botBubbleText}
+            {botBubbleText || t("voice_prompt")}
           </div>
         )}
         <button 

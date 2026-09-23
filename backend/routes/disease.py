@@ -137,7 +137,27 @@ def analyze_with_gemini(pil_image: Image.Image, custom_key: str = None) -> dict:
         import google.generativeai as genai
         genai.configure(api_key=api_key)
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        available = []
+        try:
+            available = [m.name.split("/")[-1] for m in genai.list_models()]
+        except Exception:
+            pass
+
+        preferred = [
+            "gemini-2.5-flash",
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro",
+            "gemini-3.6-flash"
+        ]
+        
+        candidates = []
+        for p_model in preferred:
+            if p_model in available:
+                candidates.append(p_model)
+        if not candidates:
+            candidates = preferred
+
         prompt = """
         You are a senior plant pathologist and agronomist.
         Examine this leaf photo very carefully:
@@ -164,7 +184,19 @@ def analyze_with_gemini(pil_image: Image.Image, custom_key: str = None) -> dict:
         pil_image.convert("RGB").save(buf, format="JPEG", quality=90)
         img_part = {"mime_type": "image/jpeg", "data": buf.getvalue()}
 
-        response = model.generate_content([prompt, img_part])
+        response = None
+        for cand in candidates:
+            try:
+                model = genai.GenerativeModel(cand)
+                response = model.generate_content([prompt, img_part])
+                if response and response.text:
+                    break
+            except Exception as attempt_err:
+                print(f"Gemini vision attempt with {cand} note: {attempt_err}")
+
+        if not response or not response.text:
+            return None
+
         text = response.text.strip()
         # Clean potential markdown wrapping
         if text.startswith("```"):
@@ -231,6 +263,12 @@ async def predict_disease(
                     "is restricted to 14 species. However, if this leaf is from a broadleaf tree (such as Mango, Guava, or Avocado) "
                     "featuring circular spots with yellow halos, the actual disease is foliar Anthracnose (Colletotrichum) or "
                     "Bacterial Black Spot (Xanthomonas). Do NOT prune grapevines; instead apply Copper Oxychloride @ 2.5g/L."
+                )
+            elif confidence < 35.0 and "healthy" not in disease_class.lower():
+                note = (
+                    "ℹ️ Low Confidence Notice: The local offline model matched this pattern with low confidence (<35%). "
+                    "For best accuracy, ensure the photo is taken in clear lighting focused closely on the diseased leaf lesions, "
+                    "or enter a Gemini API Key in Settings to activate Multimodal AI Vision for open-world crops (Mango, Cotton, etc.)."
                 )
 
             return {

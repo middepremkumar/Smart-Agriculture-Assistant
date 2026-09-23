@@ -285,14 +285,32 @@ def predict_land(data: LandInput):
             road_factor = max(0.7, 1 - (data.road_km * 0.05))
             price = base * data.area_acres * SOIL_MULT[data.soil_type] * IRR_MULT[data.irrigation] * road_factor
 
+        total_val = round(price)
+        per_acre = round(price / data.area_acres)
+
+        # Format Lakhs/Crores display string in Indian currency
+        if total_val >= 10000000:
+            val_formatted = f"₹{total_val / 10000000:.2f} Crores"
+        else:
+            val_formatted = f"₹{total_val / 100000:.2f} Lakhs"
+
+        if per_acre >= 10000000:
+            per_acre_formatted = f"₹{per_acre / 10000000:.2f} Cr / acre"
+        else:
+            per_acre_formatted = f"₹{per_acre / 100000:.2f} L / acre"
+
         return {
-            "total_value":    round(price),
-            "per_acre":       round(price / data.area_acres),
-            "state":          data.state.upper(),
-            "area_acres":     data.area_acres,
-            "currency":       "INR",
-            "confidence":     "±15% range",
-            "status":         "success"
+            "total_value":        total_val,
+            "total_value_str":    val_formatted,
+            "total_formatted":    val_formatted,
+            "per_acre":           per_acre,
+            "per_acre_str":       per_acre_formatted,
+            "per_acre_formatted": per_acre_formatted,
+            "state":              data.state.upper(),
+            "area_acres":         data.area_acres,
+            "currency":           "INR",
+            "confidence":         "±15% range",
+            "status":             "success"
         }
     except Exception as e:
         raise HTTPException(500, detail=str(e))
