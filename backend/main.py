@@ -45,6 +45,7 @@ from backend.routes.weather import router as weather_router
 from backend.routes.survey import router as survey_router
 from backend.routes.market import router as market_router
 from backend.routes.chat import router as chat_router
+from backend.routes.soil import router as soil_router
 
 # ===== CREATE APP =====
 app = FastAPI(
@@ -73,6 +74,7 @@ app.include_router(weather_router, prefix="/api/weather",  tags=["Weather"])
 app.include_router(survey_router,  prefix="/api/survey",   tags=["Survey"])
 app.include_router(market_router,  prefix="/api/market",   tags=["Market Prices"])
 app.include_router(chat_router,    prefix="/api/chat",     tags=["Voice AI Chatbot"])
+app.include_router(soil_router,    prefix="/api/soil",     tags=["Soil Intelligence & Amelioration"])
 
 from fastapi.responses import FileResponse
 

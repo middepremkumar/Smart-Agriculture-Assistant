@@ -3,7 +3,7 @@ import {
   Leaf, ShieldCheck, Thermometer, Bot, TrendingUp, IndianRupee, Sprout, 
   Microscope, CloudSun, BarChart2, TestTube, ClipboardList, Globe, 
   MapPin, Camera, AlertTriangle, CheckCircle, Banknote, Droplet, 
-  Smartphone, RefreshCw, Mic, Volume2, ChevronUp, X, Menu, Check,
+  Smartphone, RefreshCw, Mic, Volume2, VolumeX, Send, RotateCcw, ChevronUp, X, Menu, Check,
   Search, Navigation, Sliders, ChevronDown, Layers
 } from 'lucide-react';
 
@@ -12,12 +12,13 @@ import {
 // ================================================
 const translations = {
   en: {
-    heroDesc: "AI-powered crop guidance, disease detection, weather forecasting, market prices, and land valuation — all in one platform designed for rural and semi-urban Indian farmers.",
+    heroDesc: "AI-powered crop guidance, disease detection, weather forecasting, market prices, land valuation, and soil intelligence — all in one platform designed for Indian farmers.",
     detect_farm: "Detect My Farm",
     detecting: "Locating...",
     detected: "Detected",
     nav_home: "Home",
     nav_tools: "Tools",
+    nav_soil: "Soil Science",
     nav_schemes: "Schemes",
     nav_market: "Market",
     nav_contact: "Contact",
@@ -25,6 +26,8 @@ const translations = {
     voice_prompt: "Tap the mic and speak in your language!",
     voice_listen: "Listening...",
     voice_thinking: "Thinking...",
+    voice_assistant_title: "AgriSmart Voice & AI Assistant",
+    apply_to_crop_advisor: "Apply to Crop Recommendation →",
     nav_cta: "Try Now",
     hero_subtitle: "Empowering Indian Farmers with Smart AI",
     hero_title_1: "Smart",
@@ -35,6 +38,15 @@ const translations = {
     tool_disease_title: "Plant Disease Detection by Image",
     tool_market_title: "Market Price Analysis",
     tool_land_title: "Smart Land Valuation",
+    tool_soil_title: "Soil Intelligence & Land Amelioration",
+    soil_auto_detect_btn: "Auto-Detect My Soil (Live Location)",
+    soil_detecting: "Detecting Farmland Soil...",
+    soil_amelioration_title: "Actionable Plan: How to Make Your Land Better",
+    soil_top_crops_title: "Top High-Yield Crops for this Land",
+    soil_manual_toggle: "Manual Soil Test Card / Lab Adjustments",
+    soil_recalc_btn: "Recalculate Soil Plan",
+    soil_nutrients_title: "Soil Chemistry & Health Meters",
+    soil_dosages_title: "Precision Fertilizer Schedule (kg / acre)",
     crop_recommendations_title: "Crop Recommendation Results",
     crop_top_n_label: "Number of Recommendations",
     top_1_rec: "Top 1 Recommendation",
@@ -44,12 +56,13 @@ const translations = {
     manual_city_prompt: "We couldn't detect your location automatically. Please enter your city name below:",
   },
   te: {
-    heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు మరియు భూమి విలువ — అన్ని ఒకే వేదికపై.",
+    heroDesc: "AI ఆధారిత పంట మార్గదర్శనం, వ్యాధి గుర్తింపు, వాతావరణ అంచనా, మార్కెట్ ధరలు, భూమి విలువ మరియు నేల విశ్లేషణ — అన్ని ఒకే వేదికపై.",
     detect_farm: "నా పొలాన్ని గుర్తించు",
     detecting: "గుర్తిస్తోంది...",
     detected: "గుర్తించబడింది",
     nav_home: "హోమ్",
     nav_tools: "సాధనాలు",
+    nav_soil: "నేల విశ్లేషణ",
     nav_schemes: "పథకాలు",
     nav_market: "మార్కెట్",
     nav_contact: "సంప్రదించండి",
@@ -57,6 +70,8 @@ const translations = {
     voice_prompt: "మైక్‌ని నొక్కి మీ భాషలో మాట్లాడండి! (Tap the mic and speak!)",
     voice_listen: "వింటున్నాను...",
     voice_thinking: "ఆలోచిస్తున్నాను...",
+    voice_assistant_title: "అగ్రిస్మార్ట్ వాయిస్ & AI సహాయకుడు",
+    apply_to_crop_advisor: "ఈ విలువలను పంట సిఫార్సులో వాడండి →",
     nav_cta: "ప్రయత్నించండి",
     hero_subtitle: "స్మార్ట్ AIతో భారతీయ రైతులకు సాధికారత",
     hero_title_1: "స్మార్ట్",
@@ -67,6 +82,15 @@ const translations = {
     tool_disease_title: "చిత్రం ద్వారా మొక్కల వ్యాధి గుర్తింపు",
     tool_market_title: "మార్కెట్ ధరల విశ్లేషణ",
     tool_land_title: "స్మార్ట్ భూమి మూల్యాంకనం",
+    tool_soil_title: "నేల విశ్లేషణ & భూమి సారం పెంపు",
+    soil_auto_detect_btn: "నా నేలను గుర్తించండి (లైవ్ లొకేషన్)",
+    soil_detecting: "పొలం నేలను గుర్తిస్తోంది...",
+    soil_amelioration_title: "భూమిని మరింత సారవంతం చేయడానికి కార్యాచరణ ప్రణాళిక",
+    soil_top_crops_title: "ఈ భూమికి అత్యధిక దిగుబడినిచ్చే పంటలు",
+    soil_manual_toggle: "మ్యాన్యువల్ సాయిల్ టెస్ట్ కార్డ్ / విలువల మార్పు",
+    soil_recalc_btn: "నేల ప్రణాళికను తిరిగి లెక్కించండి",
+    soil_nutrients_title: "నేల పోషకాలు & ఆరోగ్య సూచికలు",
+    soil_dosages_title: "ఎరువుల మోతాదు ప్రణాళిక (ఎకరాకు కిలోల్లో)",
     crop_recommendations_title: "పంట సిఫార్సు ఫలితాలు",
     crop_top_n_label: "సిఫార్సుల సంఖ్య",
     top_1_rec: "టాప్ 1 సిఫార్సు",
@@ -172,14 +196,18 @@ function App() {
   const [marketData, setMarketData] = useState([]);
   const [marketLoading, setMarketLoading] = useState(false);
 
-  // Soil Analysis States
-  const [soilN, setSoilN] = useState("");
-  const [soilP, setSoilP] = useState("");
-  const [soilK, setSoilK] = useState("");
-  const [soilPh, setSoilPh] = useState("");
-  const [soilOc, setSoilOc] = useState("");
+  // Soil Intelligence & Amelioration States
+  const [soilN, setSoilN] = useState("125");
+  const [soilP, setSoilP] = useState("22");
+  const [soilK, setSoilK] = useState("315");
+  const [soilPh, setSoilPh] = useState("8.1");
+  const [soilOc, setSoilOc] = useState("0.42");
   const [soilType, setSoilType] = useState("black");
-  const [soilResult, setSoilResult] = useState(null);
+  const [soilReport, setSoilReport] = useState(null);
+  const [soilLoading, setSoilLoading] = useState(false);
+  const [soilLocationLabel, setSoilLocationLabel] = useState("");
+  const [soilAutoDetected, setSoilAutoDetected] = useState(false);
+  const [showManualSoilForm, setShowManualSoilForm] = useState(false);
 
   // Survey States
   const [surveyName, setSurveyName] = useState("");
@@ -190,17 +218,35 @@ function App() {
   const [surveySuccess, setSurveySuccess] = useState(false);
   const [surveySubmitting, setSurveySubmitting] = useState(false);
 
-  // Voice Assistant States
+  // Voice & Chat Assistant States
   const [isListening, setIsListening] = useState(false);
+  const [showVoiceDrawer, setShowVoiceDrawer] = useState(false);
+  const [voiceLang, setVoiceLang] = useState(currentLang === "te" ? "te-IN" : "en-IN");
+  const [liveTranscript, setLiveTranscript] = useState("");
+  const [chatInputText, setChatInputText] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [botBubbleText, setBotBubbleText] = useState("");
   const [showBotBubble, setShowBotBubble] = useState(true);
+  const [chatMessages, setChatMessages] = useState([
+    {
+      id: "welcome-1",
+      sender: "bot",
+      text: currentLang === "te" 
+        ? "నమస్తే! నేను మీ అగ్రిస్మార్ట్ వాయిస్ & AI సహాయకుడిని. మైక్ నొక్కి మాట్లాడండి లేదా కింద ప్రశ్న రాయండి." 
+        : "Namaste! I am your AgriSmart Voice & AI Companion. Tap the mic to speak in your language or type your question below.",
+      time: "Just now"
+    }
+  ]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const recognitionRef = useRef(null);
+  const isRecognizingRef = useRef(false);
   const currentLangRef = useRef(currentLang);
+  const voiceLangRef = useRef(voiceLang);
   const userLocationRef = useRef(userLocation);
   const weatherDataRef = useRef(weatherData);
+  const messagesEndRef = useRef(null);
 
   // Stable memoized background floating particles
   const heroParticles = useMemo(() => {
@@ -219,6 +265,13 @@ function App() {
   }, [currentLang]);
 
   useEffect(() => {
+    voiceLangRef.current = voiceLang;
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = voiceLang;
+    }
+  }, [voiceLang]);
+
+  useEffect(() => {
     userLocationRef.current = userLocation;
   }, [userLocation]);
 
@@ -226,24 +279,74 @@ function App() {
     weatherDataRef.current = weatherData;
   }, [weatherData]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages, liveTranscript]);
+
   // Translate helper
   const t = (key) => translations[currentLang]?.[key] || key;
 
-  // Speak aloud helper
+  // Speak aloud & audio controls
+  const stopSpeaking = () => {
+    if (window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
+      setIsSpeaking(false);
+    }
+  };
+
   const speakText = (text, lang = "te-IN") => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    window.speechSynthesis.speak(utterance);
+    if (!window.speechSynthesis || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+    } catch (_) {}
+    setIsSpeaking(false);
+
+    // Give browser audio queue 60ms to cancel previous buffer cleanly
+    setTimeout(() => {
+      try {
+        const cleanText = text.replace(/[*#_~`]/g, '').trim();
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = lang;
+        utterance.rate = 0.95;
+
+        const voices = window.speechSynthesis.getVoices() || [];
+        const isTe = lang.startsWith("te");
+        let matchedVoice = null;
+        if (isTe) {
+          matchedVoice = voices.find(v => v.lang && (v.lang.startsWith("te") || v.name.toLowerCase().includes("telugu")));
+        }
+        if (!matchedVoice) {
+          matchedVoice = voices.find(v => v.lang && (v.lang.includes("en-IN") || v.name.toLowerCase().includes("india")));
+        }
+        if (matchedVoice) {
+          utterance.voice = matchedVoice;
+        }
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = (err) => {
+          console.warn("TTS audio error:", err);
+          setIsSpeaking(false);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn("TTS speak exception:", e);
+        setIsSpeaking(false);
+      }
+    }, 60);
   };
 
   // Switch language
   const changeLanguage = (lang) => {
     setCurrentLang(lang);
     localStorage.setItem("agri_lang", lang);
+    const vLang = lang === "te" ? "te-IN" : "en-IN";
+    setVoiceLang(vLang);
     const msg = lang === "te" ? "భాష తెలుగులోకి మార్చబడింది." : "Language changed to English.";
-    speakText(msg, lang === "te" ? "te-IN" : "en-US");
+    speakText(msg, vLang);
   };
 
   // Scroll animations observer & Scroll Top handler
@@ -302,39 +405,73 @@ function App() {
     };
   }, []);
 
-  // Sync recognition language configurations
-  useEffect(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.lang = currentLang === "te" ? "te-IN" : "en-IN";
-    }
-  }, [currentLang]);
-
   // Speech Recognition setup
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const rec = new SpeechRecognition();
       rec.continuous = false;
-      rec.interimResults = false;
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+      rec.lang = voiceLang;
 
       rec.onstart = () => {
         setIsListening(true);
-        setBotBubbleText(currentLangRef.current === "te" ? "వింటున్నాను..." : "Listening...");
+        isRecognizingRef.current = true;
+        setLiveTranscript("");
+        setBotBubbleText(voiceLangRef.current === "te-IN" ? "వింటున్నాను... మాట్లాడండి" : "Listening... Speak now");
         setShowBotBubble(true);
       };
 
       rec.onresult = async (event) => {
-        const transcript = event.results[0][0].transcript;
-        setBotBubbleText(`You: "${transcript}"`);
-        await sendToChatbot(transcript);
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        if (interim) {
+          setLiveTranscript(interim);
+          setBotBubbleText(`"${interim}..."`);
+        }
+        if (final) {
+          setLiveTranscript("");
+          setBotBubbleText(`"${final}"`);
+          handleSendChatMessage(final);
+        }
       };
 
-      rec.onerror = () => {
-        setBotBubbleText("Didn't catch that. Tap to try again.");
+      rec.onerror = (event) => {
+        console.warn("Speech recognition error event:", event.error);
+        isRecognizingRef.current = false;
         setIsListening(false);
+
+        let errMsg = "Didn't catch that. Tap to try again.";
+        if (event.error === "not-allowed") {
+          errMsg = voiceLangRef.current === "te-IN"
+            ? "మైక్రోఫోన్ అనుమతి నిరాకరించబడింది. బ్రౌజర్ URL బార్‌లోని లాక్ ఐకాన్‌పై క్లిక్ చేసి మైక్ అనుమతించండి."
+            : "Microphone access blocked. Please allow mic permission in your browser address bar.";
+        } else if (event.error === "no-speech") {
+          errMsg = voiceLangRef.current === "te-IN"
+            ? "ధ్వని వినిపించలేదు. దయచేసి మైక్ దగ్గర స్పష్టంగా మాట్లాడండి."
+            : "No voice detected. Please speak clearly into your microphone.";
+        } else if (event.error === "audio-capture") {
+          errMsg = voiceLangRef.current === "te-IN"
+            ? "మైక్రోఫోన్ హార్డ్‌వేర్ కనుగొనబడలేదు. దయచేసి మైక్ ప్లగ్ చేయండి."
+            : "No microphone hardware detected. Please connect a microphone.";
+        } else if (event.error === "network") {
+          errMsg = voiceLangRef.current === "te-IN"
+            ? "నెట్‌వర్క్ సమస్య. దయచేసి ఇంటర్నెట్ కనెక్షన్ తనిఖీ చేయండి."
+            : "Speech recognition network error. Please check your internet connection.";
+        }
+        setBotBubbleText(errMsg);
       };
 
       rec.onend = () => {
+        isRecognizingRef.current = false;
         setIsListening(false);
       };
 
@@ -346,24 +483,71 @@ function App() {
   const toggleVoice = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Your browser doesn't support Voice AI. Try Chrome or Edge.");
+      alert("Your browser doesn't support the Speech Recognition Web API. You can still type your questions in the assistant chat drawer!");
+      setShowVoiceDrawer(true);
       return;
     }
-    if (isListening) {
-      recognitionRef.current.stop();
+
+    setShowVoiceDrawer(true);
+
+    if (isListening || isRecognizingRef.current) {
+      try {
+        recognitionRef.current?.stop();
+      } catch (err) {
+        console.warn("Stop recognition exception:", err);
+      }
+      setIsListening(false);
+      isRecognizingRef.current = false;
     } else {
-      window.speechSynthesis.cancel();
-      recognitionRef.current.start();
+      stopSpeaking();
+      try {
+        if (recognitionRef.current) {
+          recognitionRef.current.lang = voiceLangRef.current;
+          recognitionRef.current.start();
+          isRecognizingRef.current = true;
+          setIsListening(true);
+          setLiveTranscript("");
+          setBotBubbleText(voiceLangRef.current === "te-IN" ? "వింటున్నాను... మాట్లాడండి" : "Listening... Speak now");
+          setShowBotBubble(true);
+        }
+      } catch (err) {
+        console.warn("Start recognition exception:", err);
+        try { recognitionRef.current?.stop(); } catch (_) {}
+        isRecognizingRef.current = false;
+        setIsListening(false);
+      }
     }
   };
 
+  const handleSendChatMessage = async (text) => {
+    if (!text || !text.trim()) return;
+    const userMsg = text.trim();
+    setChatInputText("");
+    setShowVoiceDrawer(true);
+
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setChatMessages((prev) => [
+      ...prev,
+      { id: Date.now() + "-user", sender: "user", text: userMsg, time: timeStr }
+    ]);
+
+    await sendToChatbot(userMsg);
+  };
+
+  const handleChatFormSubmit = (e) => {
+    e.preventDefault();
+    handleSendChatMessage(chatInputText);
+  };
+
   const sendToChatbot = async (text) => {
-    setBotBubbleText(currentLangRef.current === "te" ? "ఆలోచిస్తున్నాను..." : "Thinking...");
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setBotBubbleText(voiceLangRef.current === "te-IN" ? "ఆలోచిస్తున్నాను..." : "Thinking...");
     try {
       const headers = { "Content-Type": "application/json" };
       if (geminiApiKey) {
         headers["x-gemini-key"] = geminiApiKey;
       }
+      const langCode = voiceLangRef.current.startsWith("te") ? "te" : "en";
       const res = await fetch("/api/chat", {
         method: "POST",
         headers,
@@ -371,15 +555,34 @@ function App() {
           message: text,
           location: userLocationRef.current,
           weather: weatherDataRef.current ? weatherDataRef.current.description : "Unknown",
+          soil_type: soilReport?.soil_profile?.name || undefined,
+          crop: cropRecommendations.length > 0 && !cropRecommendations[0].error ? cropRecommendations[0].crop : undefined,
+          disease: diseaseResult?.disease || undefined,
           api_key: geminiApiKey || undefined,
-          language: currentLangRef.current || "te",
+          language: langCode,
         }),
       });
       const data = await res.json();
-      setBotBubbleText(data.response);
-      speakText(data.response, currentLangRef.current === "te" ? "te-IN" : "en-IN");
+      const botResponse = data.response || (voiceLangRef.current === "te-IN" 
+        ? "మీ వ్యవసాయ ప్రశ్నకు సమాధానం సిద్ధంగా ఉంది." 
+        : "I am here to help you with your crops, soil, and fertilizers.");
+
+      setBotBubbleText(botResponse);
+      setChatMessages((prev) => [
+        ...prev,
+        { id: Date.now() + "-bot", sender: "bot", text: botResponse, time: timeStr, source: data.source }
+      ]);
+      speakText(botResponse, voiceLangRef.current);
     } catch (err) {
-      setBotBubbleText(currentLangRef.current === "te" ? "నమస్తే, సర్వర్ కనెక్ట్ కావడంలో ఇబ్బందిగా ఉంది." : "Sorry, I am having trouble connecting.");
+      console.error("Chat error:", err);
+      const errMsg = voiceLangRef.current === "te-IN" 
+        ? "నమస్తే, సర్వర్ కనెక్ట్ కావడంలో ఇబ్బందిగా ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి." 
+        : "Sorry, I am having trouble connecting to the agronomic server. Please try again.";
+      setBotBubbleText(errMsg);
+      setChatMessages((prev) => [
+        ...prev,
+        { id: Date.now() + "-bot", sender: "bot", text: errMsg, time: timeStr }
+      ]);
     }
   };
 
@@ -496,12 +699,77 @@ function App() {
     }
   }, [cropTopN]);
 
+  // SOIL AUTO-DETECTION HELPER
+  const detectSoilFromLocation = async (lat = null, lon = null, city = null, state = null) => {
+    setSoilLoading(true);
+    try {
+      const payload = {};
+      if (lat != null && lon != null) {
+        payload.lat = parseFloat(lat);
+        payload.lon = parseFloat(lon);
+      }
+      if (city) payload.city = city;
+      if (state) payload.state = state;
+
+      const res = await fetch("/api/soil/auto-detect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (res.status === 200 && data.status === "success") {
+        setSoilReport(data);
+        setSoilLocationLabel(data.location_detected?.place_name || "Detected Farmland");
+        setSoilAutoDetected(true);
+        if (data.soil_chemistry) {
+          setSoilN(data.soil_chemistry.nitrogen.toString());
+          setSoilP(data.soil_chemistry.phosphorus.toString());
+          setSoilK(data.soil_chemistry.potassium.toString());
+          setSoilPh(data.soil_chemistry.ph.toString());
+          setSoilOc(data.soil_chemistry.organic_carbon.toString());
+        }
+        if (data.soil_profile?.type_code) {
+          setSoilType(data.soil_profile.type_code);
+        }
+      }
+    } catch (err) {
+      console.error("Soil auto-detect error:", err);
+    } finally {
+      setSoilLoading(false);
+    }
+  };
+
+  const handleLiveSoilDetection = () => {
+    if (!navigator.geolocation) {
+      detectSoilFromLocation(null, null, userLocation !== "Unknown" ? userLocation.split(",")[0].trim() : "Kurnool", null);
+      return;
+    }
+    setSoilLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        detectSoilFromLocation(lat, lon, null, null);
+      },
+      (err) => {
+        console.warn("Soil GPS prompt denied or error:", err.message);
+        detectSoilFromLocation(null, null, userLocation !== "Unknown" ? userLocation.split(",")[0].trim() : "Kurnool", null);
+      },
+      { timeout: 7000, enableHighAccuracy: true }
+    );
+  };
+
+  // Initial soil load for default location (Kurnool, AP)
+  useEffect(() => {
+    detectSoilFromLocation(15.8281, 78.0373, "Kurnool", "Andhra Pradesh");
+  }, []);
+
   // GEOLOCATION
   const autoDetectLocation = async () => {
     if (locationLoading) return;
     setLocationLoading(true);
 
-    const handleSuccess = async (city, region) => {
+    const handleSuccess = async (city, region, lat = null, lon = null) => {
       const formattedLoc = `${city}, ${region}`;
       setUserLocation(formattedLoc);
       setLocationDisplay(formattedLoc);
@@ -516,6 +784,10 @@ function App() {
 
       // Trigger crop recommendations with these new values
       predictCrop(city, wData);
+
+      // Auto-detect real soil profile for this location
+      detectSoilFromLocation(lat, lon, city, region);
+
       setLocationLoading(false);
     };
 
@@ -530,6 +802,8 @@ function App() {
       try {
         let city = "";
         let region = "";
+        let lat = null;
+        let lon = null;
 
         // Primary IP service: ipwho.is (reliable, free, non-rate-limited)
         try {
@@ -538,6 +812,10 @@ function App() {
           if (data && data.success !== false && data.city) {
             city = data.city;
             region = data.region || "";
+            if (data.latitude && data.longitude) {
+              lat = data.latitude;
+              lon = data.longitude;
+            }
           }
         } catch (e1) {
           console.warn("ipwho.is lookup failed, trying secondary:", e1);
@@ -551,6 +829,10 @@ function App() {
             if (data && data.city && !data.error) {
               city = data.city;
               region = data.region || "";
+              if (data.latitude && data.longitude) {
+                lat = data.latitude;
+                lon = data.longitude;
+              }
             }
           } catch (e2) {
             console.warn("ipapi.co lookup failed:", e2);
@@ -561,13 +843,15 @@ function App() {
         if (!city) {
           city = "Kurnool";
           region = "Andhra Pradesh";
+          lat = 15.8281;
+          lon = 78.0373;
         }
 
-        await handleSuccess(city, region);
+        await handleSuccess(city, region, lat, lon);
       } catch (e) {
         console.error("IP Location Error:", e);
         setLocationLoading(false);
-        await handleSuccess("Kurnool", "Andhra Pradesh");
+        await handleSuccess("Kurnool", "Andhra Pradesh", 15.8281, 78.0373);
       }
     };
 
@@ -588,7 +872,7 @@ function App() {
           const addr = data.address || {};
           const city = addr.village || addr.town || addr.city || addr.suburb || addr.county || "Your Area";
           const state = addr.state || "";
-          await handleSuccess(city, state);
+          await handleSuccess(city, state, lat, lon);
         } catch (e) {
           console.error("Nominatim Geocode Error:", e);
           await fallbackToIP();
@@ -1052,30 +1336,51 @@ function App() {
     fetchMarketPrices(val);
   };
 
-  // Soil analysis client-side logic
-  const handleSoilAnalysis = (e) => {
+  // Soil analysis customized / manual submission
+  const handleSoilAnalysis = async (e) => {
     e.preventDefault();
     const n = parseFloat(soilN);
+    const p = parseFloat(soilP);
+    const k = parseFloat(soilK);
     const ph = parseFloat(soilPh);
-    if (isNaN(n) && isNaN(ph)) {
-      alert("Enter soil parameters (minimum Nitrogen or pH)");
+    const oc = parseFloat(soilOc || 0.45);
+
+    if (isNaN(n) || isNaN(p) || isNaN(k) || isNaN(ph)) {
+      alert("Please enter valid numeric values for Nitrogen, Phosphorus, Potassium, and pH.");
       return;
     }
 
-    const p = parseFloat(soilP || 0);
-    const k = parseFloat(soilK || 0);
-    const oc = parseFloat(soilOc || 0);
-
-    const alerts = [];
-    if (n < 50) alerts.push("Low Nitrogen — Apply Urea 120 kg/ha");
-    if (n > 150) alerts.push("High Nitrogen — Reduce N fertilizer");
-    if (p < 25) alerts.push("Low Phosphorus — Apply DAP 60 kg/ha");
-    if (k < 50) alerts.push("Low Potassium — Apply MOP 80 kg/ha");
-    if (ph < 5.5) alerts.push("Acidic soil — Apply lime 2 t/ha");
-    if (ph > 8) alerts.push("Alkaline soil — Apply gypsum 4 t/ha");
-    if (oc < 0.5) alerts.push("Low organic matter — Add FYM 5 t/ha");
-
-    setSoilResult(alerts);
+    setSoilLoading(true);
+    try {
+      const res = await fetch("/api/soil/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nitrogen: n,
+          phosphorus: p,
+          potassium: k,
+          ph: ph,
+          organic_carbon: oc,
+          soil_type: soilType,
+          location_name: soilLocationLabel || "Custom Farmland"
+        }),
+      });
+      const data = await res.json();
+      if (res.status === 200 && data.status === "success") {
+        setSoilReport(data);
+        setSoilAutoDetected(false);
+        setShowManualSoilForm(false);
+      } else {
+        const errDetail = Array.isArray(data.detail)
+          ? data.detail.map(d => `${d.loc?.slice(-1)[0] || 'Field'}: ${d.msg}`).join("\n")
+          : (data.detail || "Unable to analyze soil.");
+        alert("Soil analysis error:\n" + errDetail);
+      }
+    } catch (err) {
+      alert("API Error: " + err.message);
+    } finally {
+      setSoilLoading(false);
+    }
   };
 
   // Farmer feedback survey submit
@@ -1120,6 +1425,98 @@ function App() {
     setMobileNavOpen(false);
   };
 
+  // ===== CROSS-MODULE FEATURE INTERLINKING HELPERS =====
+  const handleJumpToMandi = (cropName, category = "all") => {
+    if (category && category !== "all") {
+      setMarketFilter(category);
+      fetchMarketPrices(category);
+    } else {
+      setMarketFilter("all");
+      fetchMarketPrices("all");
+    }
+    scrollToSection("#market");
+  };
+
+  const handleJumpToDisease = (cropName) => {
+    scrollToSection("#disease");
+  };
+
+  const handleJumpToSoilForCrop = (idealSoilId) => {
+    if (idealSoilId) {
+      const soilMap = { 1: "black", 2: "red", 3: "loam", 4: "sandy", 5: "alluvial" };
+      if (soilMap[idealSoilId]) setSoilType(soilMap[idealSoilId]);
+    }
+    scrollToSection("#soil");
+  };
+
+  const handleAskVoiceAboutCrop = (cropName) => {
+    setShowVoiceDrawer(true);
+    const q = voiceLangRef.current === "te-IN"
+      ? `${cropName} పంట దిగుబడి పెంచడానికి ఎరువుల సమయం మరియు సలహా ఇవ్వండి.`
+      : `What is the best irrigation, fertilizer split, and yield advice for ${cropName}?`;
+    handleSendChatMessage(q);
+  };
+
+  const handleAskVoiceAboutDisease = (cropType, diseaseName) => {
+    setShowVoiceDrawer(true);
+    const q = voiceLangRef.current === "te-IN"
+      ? `${cropType} లో ${diseaseName} తెగులు నివారణకు సరైన పిచికారీ మందులు మరియు జాగ్రత్తలు ఏమిటి?`
+      : `How do I treat ${diseaseName} on ${cropType} with exact chemical spray and organic steps?`;
+    handleSendChatMessage(q);
+  };
+
+  const handleAskVoiceAboutSoil = () => {
+    setShowVoiceDrawer(true);
+    const q = voiceLangRef.current === "te-IN"
+      ? "నా పొలం నేల సారం పెంచడానికి మరియు చౌడు/ఆమ్లతను సరిచేయడానికి ప్రణాళిక చెప్పండి."
+      : "How do I implement my soil amelioration plan and apply Gypsum or FYM on my land?";
+    handleSendChatMessage(q);
+  };
+
+  const handleAskVoiceAboutLand = () => {
+    setShowVoiceDrawer(true);
+    const loc = landInspectionData?.place_name || userLocation;
+    const q = voiceLangRef.current === "te-IN"
+      ? `${loc} లో నా వ్యవసాయ భూమి మార్కెట్ విలువ మరియు దిగుబడిని ఎలా పెంచుకోవచ్చు?`
+      : `What farm improvements can best increase the agricultural market value of my land in ${loc}?`;
+    handleSendChatMessage(q);
+  };
+
+  const handleAskVoiceAboutWeather = () => {
+    setShowVoiceDrawer(true);
+    const loc = weatherData?.city || userLocation;
+    const q = voiceLangRef.current === "te-IN"
+      ? `${loc} లో ఈరోజు ఉన్న వాతావరణానికి పురుగుమందులు లేదా ఎరువులు పిచికారీ చేయవచ్చా?`
+      : `Based on current weather in ${loc}, is it suitable for pesticide and foliar fertilizer spraying today?`;
+    handleSendChatMessage(q);
+  };
+
+  const handleApplySoilToLand = () => {
+    if (soilReport?.soil_profile?.type_id) {
+      setLandSoil(String(soilReport.soil_profile.type_id));
+    }
+    if (soilReport?.location_detected?.lat && soilReport?.location_detected?.lon) {
+      setSelectedCoords({
+        lat: soilReport.location_detected.lat,
+        lon: soilReport.location_detected.lon
+      });
+      inspectLandCoords(soilReport.location_detected.lat, soilReport.location_detected.lon, landAreaSlider);
+    }
+    scrollToSection("#land");
+  };
+
+  const handleInspectParcelSoil = () => {
+    if (selectedCoords?.lat && selectedCoords?.lon) {
+      fetchAutoSoil(selectedCoords.lat, selectedCoords.lon);
+    }
+    scrollToSection("#soil");
+  };
+
+  const handleInspectParcelCrops = () => {
+    predictCrop(landInspectionData?.place_name || null);
+    scrollToSection("#crop");
+  };
+
   return (
     <>
       {/* ===== NAVIGATION ===== */}
@@ -1131,6 +1528,7 @@ function App() {
         <ul className="nav-links">
           <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection("#home"); }}>{t("nav_home")}</a></li>
           <li><a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection("#features"); }}>{t("nav_tools")}</a></li>
+          <li><a href="#soil" onClick={(e) => { e.preventDefault(); scrollToSection("#soil"); }}>{t("nav_soil")}</a></li>
           <li><a href="#schemes" onClick={(e) => { e.preventDefault(); scrollToSection("#schemes"); }}>{t("nav_schemes")}</a></li>
           <li><a href="#market" onClick={(e) => { e.preventDefault(); scrollToSection("#market"); }}>{t("nav_market")}</a></li>
           <li><a href="#survey" onClick={(e) => { e.preventDefault(); scrollToSection("#survey"); }}>{t("nav_contact")}</a></li>
@@ -1147,6 +1545,7 @@ function App() {
       <div className={`mobile-nav ${mobileNavOpen ? "open" : ""}`} id="mobileNav">
         <button className="mobile-nav-close" onClick={() => setMobileNavOpen(false)}><X size={28} /></button>
         <a href="#features" onClick={() => scrollToSection("#features")}>Features</a>
+        <a href="#soil" onClick={() => scrollToSection("#soil")}>Soil Science</a>
         <a href="#crop" onClick={() => scrollToSection("#crop")}>Crop AI</a>
         <a href="#disease" onClick={() => scrollToSection("#disease")}>Disease</a>
         <a href="#weather" onClick={() => scrollToSection("#weather")}>Weather</a>
@@ -1427,6 +1826,25 @@ function App() {
                   {cropPredicting ? <span className="spinner"></span> : <CloudSun size={16} />} 
                   {currentLang === "te" ? "రియల్-టైమ్ వాతావరణాన్ని తీసుకోండి" : "Take Real-Time Weather"}
                 </button>
+                {soilReport && (
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "11px 16px", borderColor: "rgba(46,204,113,0.4)", color: "var(--green-400)" }}
+                    onClick={() => {
+                      if (soilReport.soil_chemistry) {
+                        setSoilN(String(soilReport.soil_chemistry.nitrogen));
+                        setSoilP(String(soilReport.soil_chemistry.phosphorus));
+                        setSoilK(String(soilReport.soil_chemistry.potassium));
+                        setSoilPh(String(soilReport.soil_chemistry.ph));
+                      }
+                      predictCrop();
+                    }}
+                    title="Import N, P, K, pH from latest Soil Analysis test"
+                  >
+                    <TestTube size={14} /> {currentLang === "te" ? "నేల పరీక్ష NPK వాడండి" : "Import Soil Test NPK"}
+                  </button>
+                )}
                 <button
                   className="btn-outline"
                   style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "11px 16px" }}
@@ -1472,6 +1890,41 @@ function App() {
                               </div>
                               <div className="crop-rec-tip" style={{ fontSize: "0.8rem", color: "var(--gray-300)", marginTop: "4px" }}>
                                 <strong>{currentLang === "te" ? "ఎరువుల చిట్కా" : "Fertilizer Tip"}:</strong> {item.fertilizer_tip}
+                              </div>
+                              {/* Feature Cross-Links */}
+                              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
+                                <button
+                                  type="button"
+                                  className="btn-link-action"
+                                  onClick={() => handleJumpToMandi(item.crop, item.interlinks?.mandi_category)}
+                                  title="Check real-time Mandi market rates for this crop"
+                                >
+                                  💰 {currentLang === "te" ? "మార్కెట్ ధరలు" : "Mandi Prices"}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-link-action"
+                                  onClick={() => handleJumpToDisease(item.crop)}
+                                  title="Scan leaf for diseases"
+                                >
+                                  🔬 {currentLang === "te" ? "ఆకు తెగుళ్లు" : "Disease Scanner"}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-link-action"
+                                  onClick={() => handleAskVoiceAboutCrop(item.crop)}
+                                  title="Ask Voice AI about this crop"
+                                >
+                                  🎙️ {currentLang === "te" ? "వాయిస్ సలహా" : "Ask Voice AI"}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-link-action"
+                                  onClick={() => handleJumpToSoilForCrop(item.interlinks?.ideal_soil_id)}
+                                  title="Check ideal soil conditioning for this crop"
+                                >
+                                  🧪 {currentLang === "te" ? "నేల సరిపోలిక" : "Soil Plan"}
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -1641,6 +2094,33 @@ function App() {
                         Engine: {diseaseResult.engine}
                       </div>
                     )}
+                    {/* Disease Cross-Links */}
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "12px" }}>
+                      <button
+                        type="button"
+                        className="btn-link-action"
+                        onClick={() => handleAskVoiceAboutDisease(diseaseResult.crop_type, diseaseResult.disease)}
+                        title="Ask Voice AI for spoken step-by-step spray instructions"
+                      >
+                        🎙️ {currentLang === "te" ? "వాయిస్ చికిత్స సలహా" : "Voice Treatment Guide"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-link-action"
+                        onClick={() => scrollToSection("#soil")}
+                        title="Check soil potash and micronutrients to build disease resistance"
+                      >
+                        🧪 {currentLang === "te" ? "నేల రోగనిరోధకత" : "Check Soil Potash"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-link-action"
+                        onClick={() => scrollToSection("#crop")}
+                        title="Check alternate resistant crops in Crop Recommendation"
+                      >
+                        🌾 {currentLang === "te" ? "పంట సిఫార్సు" : "Alternate Crops"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1831,6 +2311,34 @@ function App() {
                     Agro-Climatic Reg. Zone
                   </div>
                 </div>
+              </div>
+
+              {/* Land Spatial Cross-Links */}
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", margin: "14px 0" }}>
+                <button
+                  type="button"
+                  className="btn-link-action"
+                  onClick={handleInspectParcelSoil}
+                  title="Run precision soil test & amelioration plan for this parcel's GPS"
+                >
+                  🧪 {currentLang === "te" ? "ఈ భూమి నేల పరీక్ష" : "Analyze Parcel Soil"}
+                </button>
+                <button
+                  type="button"
+                  className="btn-link-action"
+                  onClick={handleInspectParcelCrops}
+                  title="Recommend optimal crops for this parcel"
+                >
+                  🌾 {currentLang === "te" ? "తగిన పంటలు" : "Recommend Crops"}
+                </button>
+                <button
+                  type="button"
+                  className="btn-link-action"
+                  onClick={handleAskVoiceAboutLand}
+                  title="Ask Voice AI how to boost this land's yield and value"
+                >
+                  🎙️ {currentLang === "te" ? "వాయిస్ AI సలహా" : "Ask Voice AI"}
+                </button>
               </div>
 
               {/* Manual Override / Tuning Accordion */}
@@ -2045,6 +2553,27 @@ function App() {
                       : `Use This Real-Time Weather for Crop Recommendation (${weatherData.temperature}°C)`}
                   </button>
                 )}
+                {weatherData && (
+                  <button
+                    type="button"
+                    onClick={handleAskVoiceAboutWeather}
+                    className="btn-outline"
+                    style={{
+                      width: "100%",
+                      marginTop: "10px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      padding: "10px 16px"
+                    }}
+                  >
+                    <Mic size={15} />
+                    {currentLang === "te"
+                      ? "పురుగుమందుల పిచికారీకి వాతావరణం అనుకూలమా? (వాయిస్ AI)"
+                      : "Is Today Safe for Spraying? (Ask Voice AI)"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -2093,6 +2622,7 @@ function App() {
                   <th style={{ textAlign: "left" }}>Price (₹/qtl)</th>
                   <th style={{ textAlign: "left" }}>Change</th>
                   <th style={{ textAlign: "left" }}>Updated</th>
+                  <th style={{ textAlign: "center" }}>Cross-Module Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -2111,11 +2641,43 @@ function App() {
                         </div>
                       </td>
                       <td style={{ color: "var(--gray-600)", fontSize: "0.8rem", textAlign: "left" }}>{row.updated}</td>
+                      <td style={{ textAlign: "center" }}>
+                        <div style={{ display: "inline-flex", gap: "6px" }}>
+                          <button
+                            type="button"
+                            className="btn-link-action"
+                            style={{ padding: "4px 8px", fontSize: "0.72rem" }}
+                            onClick={() => {
+                              predictCrop(row.market);
+                              scrollToSection("#crop");
+                            }}
+                            title="Check if this crop can grow on your farmland"
+                          >
+                            🌾 {currentLang === "te" ? "పండించవచ్చా?" : "Can I Grow?"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-link-action"
+                            style={{ padding: "4px 8px", fontSize: "0.72rem" }}
+                            onClick={() => {
+                              setShowVoiceDrawer(true);
+                              handleSendChatMessage(
+                                voiceLangRef.current === "te-IN"
+                                  ? `${row.market} లో ${row.crop} రాబోయే మార్కెట్ ధరల ట్రెండ్ మరియు అమ్మకపు సలహా ఏమిటి?`
+                                  : `What is the expected market price trend and selling advice for ${row.crop} in ${row.market}?`
+                              );
+                            }}
+                            title="Ask Voice AI for price trends"
+                          >
+                            🎙️ {currentLang === "te" ? "ధర ట్రెండ్" : "AI Trend"}
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                    <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
                       {marketLoading ? "Loading market rates..." : "No market rates available"}
                     </td>
                   </tr>
@@ -2126,125 +2688,532 @@ function App() {
         </div>
       </section>
 
-      {/* ===== SOIL ANALYSIS ===== */}
+      {/* ===== SOIL ANALYSIS & LAND AMELIORATION ===== */}
       <section id="soil" className="tool-section">
         <div className="container">
-          <div className="tool-layout">
-            <div className="tool-content text-left">
-              <div className="tool-badge">
-                <span className="badge badge-earth">
-                  <TestTube size={14} style={{ display: "inline", marginRight: "4px", verticalAlign: "middle" }} /> Soil Science
-                </span>
+          <div style={{ textAlign: "left", marginBottom: "28px" }}>
+            <div className="tool-badge" style={{ marginBottom: "10px" }}>
+              <span className="badge badge-earth">
+                <TestTube size={14} style={{ display: "inline", marginRight: "4px", verticalAlign: "middle" }} /> Soil Science & Land Amelioration
+              </span>
+            </div>
+            <h2 className="section-title">{t("tool_soil_title")}</h2>
+            <p className="section-subtitle" style={{ maxWidth: "800px", lineHeight: "1.6" }}>
+              Auto-detects real regional soil classification, chemistry ratings, and provides an actionable land conditioning plan with precision fertilizer dosages to significantly improve your farmland fertility.
+            </p>
+          </div>
+
+          <div className="soil-container">
+            {/* Top Action & Location Bar */}
+            <div className="soil-header-bar">
+              <div className="soil-location-badge">
+                <MapPin size={20} style={{ color: "var(--green-400)", flexShrink: 0 }} />
+                <div>
+                  <div style={{ color: "var(--green-400)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>
+                    {soilAutoDetected ? "📍 Auto-Detected Farmland" : "🌾 Farmland Zone"}
+                  </div>
+                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "1.05rem" }}>
+                    {soilReport?.location_detected?.place_name || soilLocationLabel || "Kurnool, Andhra Pradesh"}
+                  </div>
+                </div>
+                <span className="soil-pulse-dot" title="Live Soil Geo-Mapping Active"></span>
               </div>
-              <h2 className="tool-title">Soil Analysis &<br />Recommendations</h2>
-              <p className="tool-desc">
-                Enter your soil test parameters and receive specific fertilizer
-                dosage recommendations, deficiency warnings, and crop suitability
-                scores tailored for Indian agriculture.
-              </p>
-            </div>
-            <div className="tool-card" onMouseMove={handleCardMouseMove}>
-              <div className="spotlight"></div>
-              <h4 style={{ textAlign: "left" }}>Soil Test Report Values</h4>
-              <form onSubmit={handleSoilAnalysis} style={{ textAlign: "left" }}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={soilN}
-                      onChange={(e) => setSoilN(e.target.value)}
-                      placeholder=" "
-                    />
-                    <label className="form-label">N (kg/ha)</label>
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={soilP}
-                      onChange={(e) => setSoilP(e.target.value)}
-                      placeholder=" "
-                    />
-                    <label className="form-label">P (kg/ha)</label>
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={soilK}
-                      onChange={(e) => setSoilK(e.target.value)}
-                      placeholder=" "
-                    />
-                    <label className="form-label">K (kg/ha)</label>
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={soilPh}
-                      onChange={(e) => setSoilPh(e.target.value)}
-                      placeholder=" "
-                      step="0.1"
-                    />
-                    <label className="form-label">pH</label>
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={soilOc}
-                      onChange={(e) => setSoilOc(e.target.value)}
-                      placeholder=" "
-                      step="0.01"
-                    />
-                    <label className="form-label">Organic Carbon (%)</label>
-                  </div>
-                  <div className="form-group">
-                    <select 
-                      className="form-select"
-                      value={soilType}
-                      onChange={(e) => setSoilType(e.target.value)}
-                    >
-                      <option value="black">Black</option>
-                      <option value="red">Red</option>
-                      <option value="loam">Loamy</option>
-                      <option value="sandy">Sandy</option>
-                    </select>
-                    <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Soil Type</label>
-                  </div>
-                </div>
+
+              <div className="soil-header-actions">
                 <button
-                  type="submit"
+                  type="button"
                   className="btn-primary"
-                  style={{ width: "100%", marginTop: "8px" }}
+                  onClick={handleLiveSoilDetection}
+                  disabled={soilLoading}
+                  style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", fontSize: "0.88rem" }}
                 >
-                  <TestTube size={14} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} /> Analyze Soil
+                  <RefreshCw size={15} className={soilLoading ? "spin" : ""} />
+                  {soilLoading ? t("soil_detecting") : t("soil_auto_detect_btn")}
                 </button>
-              </form>
-              {soilResult !== null && (
-                <div className="result-box visible" style={{ textAlign: "left" }}>
-                  <div className="result-title">Soil Status</div>
-                  {soilResult.length > 0 ? (
-                    <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
-                      {soilResult.map((alertItem, idx) => (
-                        <li key={idx} style={{ fontSize: "0.85rem", color: "var(--earth-200)", display: "flex", alignItems: "center", gap: "6px" }}>
-                          <AlertTriangle size={14} style={{ color: "var(--earth-400)" }} /> {alertItem}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div style={{ color: "var(--green-400)", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
-                      <CheckCircle size={16} /> Soil is in good condition for most crops!
-                    </div>
-                  )}
-                </div>
-              )}
+                {soilReport && (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => {
+                      if (soilReport.soil_chemistry) {
+                        setCropN(soilReport.soil_chemistry.nitrogen.toString());
+                        setCropP(soilReport.soil_chemistry.phosphorus.toString());
+                        setCropK(soilReport.soil_chemistry.potassium.toString());
+                        setCropPh(soilReport.soil_chemistry.ph.toString());
+                      }
+                      scrollToSection("#crop");
+                      predictCrop();
+                    }}
+                    style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", fontSize: "0.85rem", background: "linear-gradient(135deg, #10b981, #059669)" }}
+                    title="Send these soil values to Crop Advisor"
+                  >
+                    <Sprout size={15} /> {t("apply_to_crop_advisor")}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setShowManualSoilForm(!showManualSoilForm)}
+                  style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", fontSize: "0.85rem" }}
+                >
+                  <Sliders size={15} />
+                  {t("soil_manual_toggle")} {showManualSoilForm ? "▲" : "▼"}
+                </button>
+              </div>
             </div>
+
+            {/* Collapsible Manual Soil Form */}
+            {showManualSoilForm && (
+              <div className="manual-soil-form" style={{ textAlign: "left" }}>
+                <h4 style={{ marginBottom: "16px", color: "var(--green-400)", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <TestTube size={18} /> Official Soil Health Card / Laboratory Values Adjustment
+                </h4>
+                <form onSubmit={handleSoilAnalysis}>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        className="form-input"
+                        value={soilN}
+                        min="0"
+                        max="1000"
+                        onChange={(e) => setSoilN(e.target.value)}
+                        placeholder=" "
+                        required
+                      />
+                      <label className="form-label">Available Nitrogen N (kg/ha)</label>
+                    </div>
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        className="form-input"
+                        value={soilP}
+                        min="0"
+                        max="500"
+                        onChange={(e) => setSoilP(e.target.value)}
+                        placeholder=" "
+                        required
+                      />
+                      <label className="form-label">Available Phosphorus P (kg/ha)</label>
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        className="form-input"
+                        value={soilK}
+                        min="0"
+                        max="1000"
+                        onChange={(e) => setSoilK(e.target.value)}
+                        placeholder=" "
+                        required
+                      />
+                      <label className="form-label">Available Potassium K (kg/ha)</label>
+                    </div>
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        className="form-input"
+                        value={soilPh}
+                        min="3.0"
+                        max="11.0"
+                        step="0.1"
+                        onChange={(e) => setSoilPh(e.target.value)}
+                        placeholder=" "
+                        required
+                      />
+                      <label className="form-label">Soil pH (Reaction 3.0 - 11.0)</label>
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        className="form-input"
+                        value={soilOc}
+                        min="0.01"
+                        max="10.0"
+                        step="0.01"
+                        onChange={(e) => setSoilOc(e.target.value)}
+                        placeholder=" "
+                        required
+                      />
+                      <label className="form-label">Organic Carbon OC (%)</label>
+                    </div>
+                    <div className="form-group">
+                      <select 
+                        className="form-select"
+                        value={soilType}
+                        onChange={(e) => setSoilType(e.target.value)}
+                      >
+                        <option value="black">Black Cotton Soil (Vertisol)</option>
+                        <option value="red">Red Sandy / Loam (Alfisol)</option>
+                        <option value="loam">Loamy Soil (Inceptisol)</option>
+                        <option value="alluvial">Alluvial Soil (Entisol)</option>
+                        <option value="sandy">Sandy / Arid Soil</option>
+                      </select>
+                      <label className="form-label" style={{ transform: "translateY(-18px) scale(0.85)" }}>Soil Type Classification</label>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                    <button type="submit" className="btn-primary" disabled={soilLoading} style={{ padding: "10px 24px" }}>
+                      <TestTube size={15} style={{ display: "inline", marginRight: "6px" }} />
+                      {soilLoading ? "Recalculating..." : t("soil_recalc_btn")}
+                    </button>
+                    <button type="button" className="btn-outline" onClick={() => setShowManualSoilForm(false)} style={{ padding: "10px 18px" }}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Main Soil Report Display */}
+            {soilReport && (
+              <>
+                {/* 1. Soil Classification Profile Card */}
+                <div className="soil-profile-card" style={{ textAlign: "left" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "rgba(46, 204, 113, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(46, 204, 113, 0.3)" }}>
+                        <Layers size={24} style={{ color: "var(--green-400)" }} />
+                      </div>
+                      <div>
+                        <span className="badge badge-green" style={{ fontSize: "0.7rem", marginBottom: "4px" }}>Ground-Truth Soil Classification</span>
+                        <h3 style={{ fontSize: "1.45rem", fontWeight: 800, color: "#fff", margin: 0 }}>
+                          {soilReport.soil_profile.name}
+                        </h3>
+                      </div>
+                    </div>
+                    <span className="badge" style={{ background: "rgba(46, 204, 113, 0.15)", color: "var(--green-400)", border: "1px solid rgba(46, 204, 113, 0.3)", padding: "6px 14px", fontSize: "0.8rem" }}>
+                      ✓ ICAR Regional Match
+                    </span>
+                  </div>
+
+                  <p style={{ color: "var(--gray-100)", marginTop: "14px", lineHeight: "1.65", fontSize: "0.95rem" }}>
+                    {soilReport.soil_profile.description}
+                  </p>
+
+                  <div style={{ display: "flex", gap: "12px", marginTop: "16px", flexWrap: "wrap" }}>
+                    <div style={{ background: "rgba(0, 0, 0, 0.25)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: "8px 14px", borderRadius: "var(--radius-sm)", fontSize: "0.85rem" }}>
+                      <strong style={{ color: "var(--green-400)" }}>Texture:</strong> <span style={{ color: "var(--gray-200)" }}>{soilReport.soil_profile.texture}</span>
+                    </div>
+                    <div style={{ background: "rgba(0, 0, 0, 0.25)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: "8px 14px", borderRadius: "var(--radius-sm)", fontSize: "0.85rem" }}>
+                      <strong style={{ color: "var(--green-400)" }}>Drainage & Aeration:</strong> <span style={{ color: "var(--gray-200)" }}>{soilReport.soil_profile.drainage}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Soil Health & Nutrient Meters (5 metrics) */}
+                <div style={{ textAlign: "left" }}>
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "16px", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <TestTube size={18} style={{ color: "var(--green-400)" }} /> {t("soil_nutrients_title")}
+                  </h3>
+                  <div className="soil-nutrients-grid">
+                    {/* Nitrogen Card */}
+                    <div className="soil-nutrient-card">
+                      <div className="soil-metric-header">
+                        <span className="soil-metric-title">Available N</span>
+                        <span className="badge" style={{
+                          background: soilReport.ratings.nitrogen.color === "green" ? "rgba(46, 204, 113, 0.15)" : soilReport.ratings.nitrogen.color === "orange" ? "rgba(245, 158, 11, 0.15)" : "rgba(59, 130, 246, 0.15)",
+                          color: soilReport.ratings.nitrogen.color === "green" ? "#2ecc71" : soilReport.ratings.nitrogen.color === "orange" ? "#fbbf24" : "#60a5fa",
+                          border: `1px solid ${soilReport.ratings.nitrogen.color === "green" ? "rgba(46, 204, 113, 0.3)" : soilReport.ratings.nitrogen.color === "orange" ? "rgba(245, 158, 11, 0.3)" : "rgba(59, 130, 246, 0.3)"}`,
+                          fontSize: "0.72rem"
+                        }}>
+                          {soilReport.ratings.nitrogen.level}
+                        </span>
+                      </div>
+                      <div className="soil-metric-value">
+                        {soilReport.soil_chemistry.nitrogen} <span className="soil-metric-unit">kg/ha</span>
+                      </div>
+                      <div className="soil-progress-track">
+                        <div 
+                          className="soil-progress-fill" 
+                          style={{
+                            width: `${Math.min(100, Math.round(((soilReport.soil_chemistry.nitrogen || 0) / 280) * 100))}%`,
+                            background: soilReport.ratings.nitrogen.color === "green" ? "#2ecc71" : soilReport.ratings.nitrogen.color === "orange" ? "#f59e0b" : "#3b82f6"
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--gray-300)", lineHeight: "1.4" }}>
+                        {soilReport.ratings.nitrogen.comment}
+                      </div>
+                    </div>
+
+                    {/* Phosphorus Card */}
+                    <div className="soil-nutrient-card">
+                      <div className="soil-metric-header">
+                        <span className="soil-metric-title">Available P</span>
+                        <span className="badge" style={{
+                          background: soilReport.ratings.phosphorus.color === "green" ? "rgba(46, 204, 113, 0.15)" : soilReport.ratings.phosphorus.color === "orange" ? "rgba(245, 158, 11, 0.15)" : "rgba(59, 130, 246, 0.15)",
+                          color: soilReport.ratings.phosphorus.color === "green" ? "#2ecc71" : soilReport.ratings.phosphorus.color === "orange" ? "#fbbf24" : "#60a5fa",
+                          border: `1px solid ${soilReport.ratings.phosphorus.color === "green" ? "rgba(46, 204, 113, 0.3)" : soilReport.ratings.phosphorus.color === "orange" ? "rgba(245, 158, 11, 0.3)" : "rgba(59, 130, 246, 0.3)"}`,
+                          fontSize: "0.72rem"
+                        }}>
+                          {soilReport.ratings.phosphorus.level}
+                        </span>
+                      </div>
+                      <div className="soil-metric-value">
+                        {soilReport.soil_chemistry.phosphorus} <span className="soil-metric-unit">kg/ha</span>
+                      </div>
+                      <div className="soil-progress-track">
+                        <div 
+                          className="soil-progress-fill" 
+                          style={{
+                            width: `${Math.min(100, Math.round(((soilReport.soil_chemistry.phosphorus || 0) / 50) * 100))}%`,
+                            background: soilReport.ratings.phosphorus.color === "green" ? "#2ecc71" : soilReport.ratings.phosphorus.color === "orange" ? "#f59e0b" : "#3b82f6"
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--gray-300)", lineHeight: "1.4" }}>
+                        {soilReport.ratings.phosphorus.comment}
+                      </div>
+                    </div>
+
+                    {/* Potassium Card */}
+                    <div className="soil-nutrient-card">
+                      <div className="soil-metric-header">
+                        <span className="soil-metric-title">Available K</span>
+                        <span className="badge" style={{
+                          background: soilReport.ratings.potassium.color === "green" ? "rgba(46, 204, 113, 0.15)" : soilReport.ratings.potassium.color === "orange" ? "rgba(245, 158, 11, 0.15)" : "rgba(59, 130, 246, 0.15)",
+                          color: soilReport.ratings.potassium.color === "green" ? "#2ecc71" : soilReport.ratings.potassium.color === "orange" ? "#fbbf24" : "#60a5fa",
+                          border: `1px solid ${soilReport.ratings.potassium.color === "green" ? "rgba(46, 204, 113, 0.3)" : soilReport.ratings.potassium.color === "orange" ? "rgba(245, 158, 11, 0.3)" : "rgba(59, 130, 246, 0.3)"}`,
+                          fontSize: "0.72rem"
+                        }}>
+                          {soilReport.ratings.potassium.level}
+                        </span>
+                      </div>
+                      <div className="soil-metric-value">
+                        {soilReport.soil_chemistry.potassium} <span className="soil-metric-unit">kg/ha</span>
+                      </div>
+                      <div className="soil-progress-track">
+                        <div 
+                          className="soil-progress-fill" 
+                          style={{
+                            width: `${Math.min(100, Math.round(((soilReport.soil_chemistry.potassium || 0) / 400) * 100))}%`,
+                            background: soilReport.ratings.potassium.color === "green" ? "#2ecc71" : soilReport.ratings.potassium.color === "orange" ? "#f59e0b" : "#3b82f6"
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--gray-300)", lineHeight: "1.4" }}>
+                        {soilReport.ratings.potassium.comment}
+                      </div>
+                    </div>
+
+                    {/* Soil pH Card */}
+                    <div className="soil-nutrient-card">
+                      <div className="soil-metric-header">
+                        <span className="soil-metric-title">Soil Reaction</span>
+                        <span className="badge" style={{
+                          background: soilReport.ratings.ph.color === "green" ? "rgba(46, 204, 113, 0.15)" : soilReport.ratings.ph.color === "purple" ? "rgba(168, 85, 247, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                          color: soilReport.ratings.ph.color === "green" ? "#2ecc71" : soilReport.ratings.ph.color === "purple" ? "#c084fc" : "#f87171",
+                          border: `1px solid ${soilReport.ratings.ph.color === "green" ? "rgba(46, 204, 113, 0.3)" : soilReport.ratings.ph.color === "purple" ? "rgba(168, 85, 247, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                          fontSize: "0.72rem"
+                        }}>
+                          {soilReport.ratings.ph.level}
+                        </span>
+                      </div>
+                      <div className="soil-metric-value">
+                        {soilReport.soil_chemistry.ph} <span className="soil-metric-unit">pH</span>
+                      </div>
+                      <div className="soil-progress-track">
+                        <div 
+                          className="soil-progress-fill" 
+                          style={{
+                            width: `${Math.min(100, Math.max(0, Math.round((((soilReport.soil_chemistry.ph || 7) - 4) / 6) * 100)))}%`,
+                            background: soilReport.ratings.ph.color === "green" ? "#2ecc71" : soilReport.ratings.ph.color === "purple" ? "#a855f7" : "#ef4444"
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--gray-300)", lineHeight: "1.4" }}>
+                        {soilReport.ratings.ph.comment}
+                      </div>
+                    </div>
+
+                    {/* Organic Carbon Card */}
+                    <div className="soil-nutrient-card">
+                      <div className="soil-metric-header">
+                        <span className="soil-metric-title">Organic Carbon</span>
+                        <span className="badge" style={{
+                          background: soilReport.ratings.organic_carbon.color === "green" ? "rgba(46, 204, 113, 0.15)" : "rgba(245, 158, 11, 0.15)",
+                          color: soilReport.ratings.organic_carbon.color === "green" ? "#2ecc71" : "#fbbf24",
+                          border: `1px solid ${soilReport.ratings.organic_carbon.color === "green" ? "rgba(46, 204, 113, 0.3)" : "rgba(245, 158, 11, 0.3)"}`,
+                          fontSize: "0.72rem"
+                        }}>
+                          {soilReport.ratings.organic_carbon.level}
+                        </span>
+                      </div>
+                      <div className="soil-metric-value">
+                        {soilReport.soil_chemistry.organic_carbon}% <span className="soil-metric-unit">OC</span>
+                      </div>
+                      <div className="soil-progress-track">
+                        <div 
+                          className="soil-progress-fill" 
+                          style={{
+                            width: `${Math.min(100, Math.round(((soilReport.soil_chemistry.organic_carbon || 0) / 1.0) * 100))}%`,
+                            background: soilReport.ratings.organic_carbon.color === "green" ? "#2ecc71" : "#f59e0b"
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--gray-300)", lineHeight: "1.4" }}>
+                        {soilReport.ratings.organic_carbon.comment}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Actionable Amelioration Plan: How to Make Land Better */}
+                <div className="soil-amelioration-section" style={{ textAlign: "left" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                    <div>
+                      <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px", margin: 0 }}>
+                        <Sprout size={22} style={{ color: "var(--green-400)" }} />
+                        {t("soil_amelioration_title")}
+                      </h3>
+                      <p style={{ color: "var(--gray-300)", fontSize: "0.88rem", marginTop: "4px" }}>
+                        Scientifically verified agronomic soil conditioning to restore chemical balance, structure, and maximize long-term harvest yields.
+                      </p>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        className="btn-link-action"
+                        onClick={handleApplySoilToLand}
+                        title="Valuate your farmland using this soil type and GPS coordinates"
+                      >
+                        🏡 {currentLang === "te" ? "ఈ నేలతో భూమి విలువ" : "Valuate Land with Soil"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-link-action"
+                        onClick={handleAskVoiceAboutSoil}
+                        title="Ask Voice AI to walk you through implementing this amelioration plan"
+                      >
+                        🎙️ {currentLang === "te" ? "వాయిస్ AI సలహా" : "Ask Voice AI"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="amelioration-grid">
+                    {soilReport.land_amelioration_plan?.actions?.map((act, idx) => (
+                      <div key={idx} className={`amelioration-card ${act.priority === "Critical" ? "priority-critical" : act.priority === "Recommended" ? "priority-recommended" : "priority-standard"}`}>
+                        <div className="amelioration-header">
+                          <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gray-300)", fontWeight: 600 }}>
+                            {act.category}
+                          </span>
+                          <span className="badge" style={{
+                            fontSize: "0.68rem",
+                            background: act.priority === "Critical" ? "rgba(239, 68, 68, 0.2)" : act.priority === "Recommended" ? "rgba(245, 158, 11, 0.2)" : "rgba(16, 185, 129, 0.2)",
+                            color: act.priority === "Critical" ? "#f87171" : act.priority === "Recommended" ? "#fbbf24" : "#34d399",
+                            border: `1px solid ${act.priority === "Critical" ? "rgba(239, 68, 68, 0.4)" : act.priority === "Recommended" ? "rgba(245, 158, 11, 0.4)" : "rgba(16, 185, 129, 0.4)"}`
+                          }}>
+                            {act.priority}
+                          </span>
+                        </div>
+                        <div className="amelioration-title">{act.title}</div>
+                        <p style={{ fontSize: "0.88rem", color: "var(--gray-200)", lineHeight: "1.55", margin: 0 }}>
+                          {act.description}
+                        </p>
+                        <div className="amelioration-benefit">
+                          <strong>Expected Benefit:</strong> {act.benefit}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Precision Fertilizer Schedule Table */}
+                <div className="tool-card" onMouseMove={handleCardMouseMove} style={{ textAlign: "left", overflowX: "auto" }}>
+                  <div className="spotlight"></div>
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                    <Droplet size={18} style={{ color: "var(--sky-300)" }} />
+                    {t("soil_dosages_title")}
+                  </h3>
+                  <p style={{ color: "var(--gray-300)", fontSize: "0.85rem", marginBottom: "16px" }}>
+                    Exact per-acre fertilizer requirements calculated to balance this specific soil's chemistry without causing toxic salt accumulation.
+                  </p>
+
+                  <table className="soil-fertilizer-table">
+                    <thead>
+                      <tr>
+                        <th>Target Nutrient</th>
+                        <th>Recommended Commercial Fertilizer</th>
+                        <th>Dosage (kg / acre)</th>
+                        <th>Application Timing & Method</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {soilReport.land_amelioration_plan?.fertilizer_dosages?.map((dose, idx) => (
+                        <tr key={idx}>
+                          <td style={{ fontWeight: 600, color: "#fff" }}>{dose.nutrient}</td>
+                          <td>
+                            <span className="badge badge-green" style={{ fontSize: "0.78rem" }}>
+                              {dose.fertilizer}
+                            </span>
+                          </td>
+                          <td style={{ fontWeight: 800, color: "var(--green-400)", fontSize: "1.05rem" }}>
+                            {dose.dosage_kg_acre} kg/acre
+                          </td>
+                          <td style={{ color: "var(--gray-200)", fontSize: "0.85rem" }}>
+                            <strong>{dose.timing}</strong> — {dose.application_method}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 5. Top Suitable High-Yield Crops for this Land */}
+                <div style={{ textAlign: "left" }}>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                    <Sprout size={20} style={{ color: "var(--green-400)" }} />
+                    {t("soil_top_crops_title")}
+                  </h3>
+                  <p style={{ color: "var(--gray-300)", fontSize: "0.88rem", marginBottom: "16px" }}>
+                    Crops proven through ICAR field trials to achieve highest yield potential on this specific soil classification.
+                  </p>
+
+                  <div className="soil-crops-grid">
+                    {soilReport.best_crops?.map((c, idx) => (
+                      <div key={idx} className="soil-crop-card">
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+                          <span style={{ fontWeight: 800, fontSize: "1.05rem", color: "#fff", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <Sprout size={16} style={{ color: "var(--green-400)" }} /> {c.crop}
+                          </span>
+                          <span className="badge badge-green" style={{ fontSize: "0.72rem" }}>
+                            {c.suitability} Match
+                          </span>
+                        </div>
+                        <p style={{ color: "var(--gray-300)", fontSize: "0.82rem", lineHeight: "1.5", margin: 0 }}>
+                          {c.reason}
+                        </p>
+                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+                          <button
+                            type="button"
+                            className="btn-link-action"
+                            style={{ padding: "3px 8px", fontSize: "0.72rem" }}
+                            onClick={() => handleJumpToMandi(c.crop)}
+                            title="Check live mandi market rates"
+                          >
+                            💰 {currentLang === "te" ? "మార్కెట్ ధర" : "Mandi Price"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-link-action"
+                            style={{ padding: "3px 8px", fontSize: "0.72rem" }}
+                            onClick={() => handleAskVoiceAboutCrop(c.crop)}
+                            title="Ask Voice AI about this crop"
+                          >
+                            🎙️ {currentLang === "te" ? "వాయిస్ AI" : "Ask Voice"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -2551,20 +3520,255 @@ function App() {
         )}
       </div>
 
-      {/* Voice Assistant Bot Bubble */}
-      <div className="voice-bot">
-        {showBotBubble && (
-          <div className="bot-bubble" id="botBubble" style={{ display: "block" }}>
-            {botBubbleText || t("voice_prompt")}
+      {/* ===== UPGRADED VOICE & AI CHAT ASSISTANT ===== */}
+      <div className="voice-bot-container">
+        {/* Floating Bubble preview if drawer is closed */}
+        {!showVoiceDrawer && showBotBubble && (
+          <div className="bot-bubble-floating" onClick={() => setShowVoiceDrawer(true)}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--green-400)", display: "flex", alignItems: "center", gap: "4px" }}>
+                <Bot size={13} /> {t("voice_assistant_title")}
+              </span>
+              <button 
+                type="button" 
+                onClick={(e) => { e.stopPropagation(); setShowBotBubble(false); }}
+                style={{ background: "transparent", border: "none", color: "var(--gray-300)", cursor: "pointer", padding: "2px" }}
+                title="Dismiss"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            <div style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+              {liveTranscript ? `"${liveTranscript}..."` : (botBubbleText || t("voice_prompt"))}
+            </div>
           </div>
         )}
+
+        {/* Floating Trigger Mic Button */}
         <button 
-          className={`bot-btn ${isListening ? "listening" : ""}`} 
+          className={`bot-btn ${isListening ? "listening" : ""} ${isSpeaking ? "speaking" : ""}`} 
           onClick={toggleVoice} 
           id="voiceBtn"
+          title={isListening ? "Listening... Tap to stop" : "Tap to speak with AgriSmart Voice AI"}
         >
-          <Mic size={24} style={{ color: "white", margin: "0 auto" }} />
+          {isListening ? (
+            <div className="sound-wave-bars">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          ) : isSpeaking ? (
+            <Volume2 size={24} style={{ color: "white", margin: "0 auto" }} />
+          ) : (
+            <Mic size={24} style={{ color: "white", margin: "0 auto" }} />
+          )}
         </button>
+
+        {/* Complete Voice & Chat Assistant Modal Drawer */}
+        {showVoiceDrawer && (
+          <div className="voice-drawer-card">
+            {/* Header */}
+            <div className="voice-drawer-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div className="bot-avatar">
+                  <Bot size={20} style={{ color: "var(--green-400)" }} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "0.98rem", color: "#fff", fontWeight: 700 }}>
+                    {t("voice_assistant_title")}
+                  </h4>
+                  <div style={{ fontSize: "0.72rem", color: isListening ? "#ef4444" : isSpeaking ? "var(--green-400)" : "var(--gray-300)", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span className={`status-dot ${isListening ? "pulse-red" : isSpeaking ? "pulse-green" : ""}`}></span>
+                    {isListening 
+                      ? (voiceLang === "te-IN" ? "మీ స్వరాన్ని వింటున్నాను..." : "Listening to your voice...")
+                      : isSpeaking 
+                      ? (voiceLang === "te-IN" ? "సమాధానం చెబుతోంది..." : "Speaking response aloud...")
+                      : (voiceLang === "te-IN" ? "మాట్లాడటానికి సిద్ధంగా ఉంది" : "Ready to assist you")}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {/* Language Switcher Pill */}
+                <button
+                  type="button"
+                  className="voice-lang-pill"
+                  onClick={() => {
+                    const nextLang = voiceLang === "te-IN" ? "en-IN" : "te-IN";
+                    setVoiceLang(nextLang);
+                    if (recognitionRef.current) {
+                      recognitionRef.current.lang = nextLang;
+                    }
+                  }}
+                  title="Switch speech language"
+                >
+                  <Globe size={13} />
+                  {voiceLang === "te-IN" ? "తెలుగు (TE)" : "English (IN)"}
+                </button>
+
+                {/* Stop Speech / Mute button */}
+                {isSpeaking && (
+                  <button 
+                    type="button" 
+                    className="icon-btn-danger" 
+                    onClick={stopSpeaking}
+                    title="Stop speaking"
+                  >
+                    <VolumeX size={16} />
+                  </button>
+                )}
+
+                {/* Close Drawer button */}
+                <button 
+                  type="button" 
+                  className="icon-btn-close" 
+                  onClick={() => { setShowVoiceDrawer(false); stopSpeaking(); }}
+                  title="Close assistant"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Conversation Messages Box */}
+            <div className="voice-messages-container">
+              {chatMessages.map((msg) => (
+                <div key={msg.id} className={`chat-message-row ${msg.sender === "user" ? "user-row" : "bot-row"}`}>
+                  {msg.sender === "bot" && (
+                    <div className="message-avatar">
+                      <Leaf size={14} style={{ color: "var(--green-400)" }} />
+                    </div>
+                  )}
+                  <div className={`chat-bubble ${msg.sender === "user" ? "user-bubble" : "bot-bubble-inside"}`}>
+                    <p style={{ margin: 0, lineHeight: "1.5" }}>{msg.text}</p>
+                    <div className="message-meta">
+                      <span>{msg.time}</span>
+                      {msg.sender === "bot" && (
+                        <button
+                          type="button"
+                          className="msg-replay-btn"
+                          onClick={() => speakText(msg.text, voiceLang)}
+                          title="Replay voice audio"
+                        >
+                          <Volume2 size={13} /> Speak
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Live speech transcription preview */}
+              {isListening && liveTranscript && (
+                <div className="chat-message-row user-row">
+                  <div className="chat-bubble user-bubble live-interim">
+                    <p style={{ margin: 0, fontStyle: "italic" }}>"{liveTranscript}..."</p>
+                    <span className="live-badge">Speaking now</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Quick Prompt Chips (Dynamic Farm Context + Core) */}
+            <div className="quick-prompts-bar">
+              {cropRecommendations.length > 0 && !cropRecommendations[0].error && (
+                <button 
+                  type="button" 
+                  className="prompt-chip active-chip" 
+                  onClick={() => handleAskVoiceAboutCrop(cropRecommendations[0].crop)}
+                  title="Ask AI about your recommended crop"
+                >
+                  🌾 {voiceLang === "te-IN" ? `${cropRecommendations[0].crop} సాగు సలహా` : `Tips for ${cropRecommendations[0].crop}`}
+                </button>
+              )}
+              {diseaseResult && (
+                <button 
+                  type="button" 
+                  className="prompt-chip active-chip" 
+                  onClick={() => handleAskVoiceAboutDisease(diseaseResult.crop_type, diseaseResult.disease)}
+                  title="Ask AI about treating this detected leaf disease"
+                >
+                  🔬 {voiceLang === "te-IN" ? `${diseaseResult.disease} నివారణ` : `Spray for ${diseaseResult.disease}`}
+                </button>
+              )}
+              {soilReport && (
+                <button 
+                  type="button" 
+                  className="prompt-chip" 
+                  onClick={handleAskVoiceAboutSoil}
+                  title="Ask AI how to implement this soil amelioration plan"
+                >
+                  🧪 {voiceLang === "te-IN" ? "నా నేల ప్రణాళిక" : "My Soil Plan"}
+                </button>
+              )}
+              {landInspectionData && (
+                <button 
+                  type="button" 
+                  className="prompt-chip" 
+                  onClick={handleAskVoiceAboutLand}
+                  title="Ask AI how to increase this land's value"
+                >
+                  🏡 {voiceLang === "te-IN" ? "భూమి విలువ పెంపు" : "Increase Land Value"}
+                </button>
+              )}
+              <button 
+                type="button" 
+                className="prompt-chip" 
+                onClick={() => handleSendChatMessage(voiceLang === "te-IN" ? "నా నేల సారం ఎలా పెంచాలి?" : "How to improve my soil fertility and health?")}
+              >
+                🧪 {voiceLang === "te-IN" ? "నేల సారం పెంపు" : "Improve Soil Fertility"}
+              </button>
+              <button 
+                type="button" 
+                className="prompt-chip" 
+                onClick={() => handleSendChatMessage(voiceLang === "te-IN" ? "ఈ నేలకు ఏ పంటలు అనుకూలం?" : "Top high yield crops for my soil")}
+              >
+                🌾 {voiceLang === "te-IN" ? "అనుకూల పంటలు" : "Best Crops for Soil"}
+              </button>
+              <button 
+                type="button" 
+                className="prompt-chip" 
+                onClick={() => handleSendChatMessage(voiceLang === "te-IN" ? "ఆకు తెగులు నివారణ మందులు ఏమిటి?" : "Leaf disease spray and pest treatment")}
+              >
+                🐛 {voiceLang === "te-IN" ? "తెగుళ్ల నివారణ" : "Disease Spray"}
+              </button>
+              <button 
+                type="button" 
+                className="prompt-chip" 
+                onClick={() => handleSendChatMessage(voiceLang === "te-IN" ? "తాజా మార్కెట్ ధరలు ఎంత?" : "Today's Mandi market prices")}
+              >
+                💰 {voiceLang === "te-IN" ? "మార్కెట్ ధరలు" : "Mandi Prices"}
+              </button>
+            </div>
+
+            {/* Input & Mic Bar */}
+            <form onSubmit={handleChatFormSubmit} className="voice-input-form">
+              <button 
+                type="button" 
+                className={`drawer-mic-btn ${isListening ? "listening" : ""}`}
+                onClick={toggleVoice}
+                title={isListening ? "Listening... Click to stop" : "Click to speak in your language"}
+              >
+                <Mic size={18} />
+              </button>
+              <input
+                type="text"
+                className="voice-text-input"
+                placeholder={voiceLang === "te-IN" ? "ప్రశ్నను ఇక్కడ టైప్ చేయండి లేదా మైక్ నొక్కండి..." : "Type farming question or tap mic to speak..."}
+                value={chatInputText}
+                onChange={(e) => setChatInputText(e.target.value)}
+              />
+              <button 
+                type="submit" 
+                className="voice-send-btn" 
+                disabled={!chatInputText.trim()}
+                title="Send message"
+              >
+                <Send size={16} />
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </>
   );

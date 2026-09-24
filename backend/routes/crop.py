@@ -57,6 +57,98 @@ FERTILIZER_ADVICE = {
     "default":  "Apply a balanced mix of Urea, DAP, and Potash (MOP) based on local soil test advice."
 }
 
+# Cross-module feature interlinking metadata
+CROP_INTERLINKS = {
+    "Rice": {
+        "mandi_crop": "Rice",
+        "mandi_category": "cereal",
+        "ideal_soil_name": "Alluvial / Clay Loam",
+        "ideal_soil_id": 5,
+        "disease_scan_available": True,
+        "disease_target": "Rice"
+    },
+    "Wheat": {
+        "mandi_crop": "Wheat",
+        "mandi_category": "cereal",
+        "ideal_soil_name": "Loamy / Alluvial",
+        "ideal_soil_id": 3,
+        "disease_scan_available": False,
+        "disease_target": "Wheat"
+    },
+    "Maize": {
+        "mandi_crop": "Maize",
+        "mandi_category": "cereal",
+        "ideal_soil_name": "Loamy / Red Loam",
+        "ideal_soil_id": 3,
+        "disease_scan_available": True,
+        "disease_target": "Corn_(maize)"
+    },
+    "Cotton": {
+        "mandi_crop": "Cotton",
+        "mandi_category": "fiber",
+        "ideal_soil_name": "Black Cotton Soil (Vertisol)",
+        "ideal_soil_id": 1,
+        "disease_scan_available": True,
+        "disease_target": "Cotton"
+    },
+    "Groundnut": {
+        "mandi_crop": "Groundnut",
+        "mandi_category": "oilseed",
+        "ideal_soil_name": "Red Sandy/Loam Soil (Alfisol)",
+        "ideal_soil_id": 2,
+        "disease_scan_available": False,
+        "disease_target": "Groundnut"
+    },
+    "Tomato": {
+        "mandi_crop": "Tomato",
+        "mandi_category": "vegetable",
+        "ideal_soil_name": "Loam / Red Sandy",
+        "ideal_soil_id": 3,
+        "disease_scan_available": True,
+        "disease_target": "Tomato"
+    },
+    "Potato": {
+        "mandi_crop": "Potato",
+        "mandi_category": "vegetable",
+        "ideal_soil_name": "Sandy Loam",
+        "ideal_soil_id": 3,
+        "disease_scan_available": True,
+        "disease_target": "Potato"
+    },
+    "Mango": {
+        "mandi_crop": "Mango",
+        "mandi_category": "fruit",
+        "ideal_soil_name": "Deep Alluvial / Red Loam",
+        "ideal_soil_id": 5,
+        "disease_scan_available": True,
+        "disease_target": "Mango"
+    },
+    "Apple": {
+        "mandi_crop": "Apple",
+        "mandi_category": "fruit",
+        "ideal_soil_name": "Well-drained Loam",
+        "ideal_soil_id": 3,
+        "disease_scan_available": True,
+        "disease_target": "Apple"
+    },
+    "Grapes": {
+        "mandi_crop": "Grape",
+        "mandi_category": "fruit",
+        "ideal_soil_name": "Sandy Loam / Light Clay",
+        "ideal_soil_id": 3,
+        "disease_scan_available": True,
+        "disease_target": "Grape"
+    },
+    "Sugarcane": {
+        "mandi_crop": "Sugarcane",
+        "mandi_category": "cereal",
+        "ideal_soil_name": "Deep Loam / Vertisol",
+        "ideal_soil_id": 1,
+        "disease_scan_available": False,
+        "disease_target": "Sugarcane"
+    }
+}
+
 # ===== LOAD MODEL ONCE AT STARTUP =====
 # We load it outside the function so it's only loaded once (not per request)
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "../ml_models/crop_model.pkl")
@@ -132,10 +224,19 @@ def predict_crop(data: CropInput):
                     c_name = str(crop_classes[idx])
                     conf = round(float(proba[idx]) * 100, 1)
                     fert = FERTILIZER_ADVICE.get(c_name.capitalize(), FERTILIZER_ADVICE["default"])
+                    interlink = CROP_INTERLINKS.get(c_name.capitalize(), {
+                        "mandi_crop": c_name.capitalize(),
+                        "mandi_category": "all",
+                        "ideal_soil_name": "Fertile Loamy Soil",
+                        "ideal_soil_id": 3,
+                        "disease_scan_available": False,
+                        "disease_target": c_name.capitalize()
+                    })
                     recommendations.append({
                         "crop": c_name.capitalize(),
                         "confidence": conf,
-                        "fertilizer_tip": fert
+                        "fertilizer_tip": fert,
+                        "interlinks": interlink
                     })
                 
                 # For backward compatibility
@@ -150,7 +251,20 @@ def predict_crop(data: CropInput):
                 classes = crop_model.classes_
                 top3_idx = np.argsort(proba)[::-1][:3]
                 alternatives = [str(classes[i]) for i in top3_idx[1:]]
-                recommendations = [{"crop": crop_name, "confidence": confidence, "fertilizer_tip": FERTILIZER_ADVICE.get(crop_name, FERTILIZER_ADVICE["default"])}]
+                interlink = CROP_INTERLINKS.get(crop_name.capitalize(), {
+                    "mandi_crop": crop_name.capitalize(),
+                    "mandi_category": "all",
+                    "ideal_soil_name": "Fertile Loamy Soil",
+                    "ideal_soil_id": 3,
+                    "disease_scan_available": False,
+                    "disease_target": crop_name.capitalize()
+                })
+                recommendations = [{
+                    "crop": crop_name, 
+                    "confidence": confidence, 
+                    "fertilizer_tip": FERTILIZER_ADVICE.get(crop_name, FERTILIZER_ADVICE["default"]),
+                    "interlinks": interlink
+                }]
         else:
             # Fallback when model not available
             fallback_crops = ["Rice", "Wheat", "Maize", "Groundnut", "Sugarcane", "Coffee", "Mango"]
@@ -161,10 +275,19 @@ def predict_crop(data: CropInput):
                 if conf < 1.0:
                     conf = 5.0
                 fert = FERTILIZER_ADVICE.get(c_name, FERTILIZER_ADVICE["default"])
+                interlink = CROP_INTERLINKS.get(c_name.capitalize(), {
+                    "mandi_crop": c_name.capitalize(),
+                    "mandi_category": "all",
+                    "ideal_soil_name": "Fertile Loamy Soil",
+                    "ideal_soil_id": 3,
+                    "disease_scan_available": False,
+                    "disease_target": c_name.capitalize()
+                })
                 recommendations.append({
                     "crop": c_name,
                     "confidence": conf,
-                    "fertilizer_tip": fert
+                    "fertilizer_tip": fert,
+                    "interlinks": interlink
                 })
             
             crop_name = recommendations[0]["crop"]
